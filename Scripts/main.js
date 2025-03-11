@@ -27,7 +27,7 @@ function preload() {
   this.load.image("background", "assets/background.png");
   this.load.spritesheet("player", "assets/player.png", {
     frameWidth: 32, // Width of each frame
-    frameHeight: 32 // Height of each frame
+    frameHeight: 33 // Height of each frame
   });
 }
 
@@ -39,6 +39,9 @@ function create() {
   // Player
   player = this.physics.add.sprite(400, 300, "player").setScale(1.5); // Create the player sprite
   player.setCollideWorldBounds(true); // Prevent the player from moving out of bounds
+
+  // Set world bounds to match the map size
+  this.physics.world.setBounds(60, 60, 1450, 970);
 
   // Define animations
   this.anims.create({
@@ -102,4 +105,10 @@ function update() {
     player.setVelocityY(0);
     player.anims.play('idle', true); // Play idle animation
   }
+
+// Camera setup
+const camera = this.cameras.main;
+  camera.startFollow(player); // Make the camera follow the player
+  camera.setZoom(2); // Zoom in (2x zoom)
+  camera.setBounds(0, 0, 2000, 2000); // Set camera bounds to match the map size
 }
