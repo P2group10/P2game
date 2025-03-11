@@ -41,7 +41,7 @@ function create() {
   player.setCollideWorldBounds(true); // Prevent the player from moving out of bounds
 
   // Set world bounds to match the map size
-  this.physics.world.setBounds(60, 60, 1450, 970);
+  this.physics.world.setBounds(60, 60, 1400, 970);
 
   // Define animations
   this.anims.create({
