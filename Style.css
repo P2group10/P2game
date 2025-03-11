@@ -1,0 +1,8 @@
+canvas {
+  background-color: black;
+  background: color(srgb red green blue);
+}
+
+h1 {
+  color: blueviolet;
+}
