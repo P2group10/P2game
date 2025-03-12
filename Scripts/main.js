@@ -1,4 +1,6 @@
 import Player from './characters.js'; // Import the Player class
+import Enemy from './enemies.js';
+import GameOverScene from './GameOverScene.js'; // Import the Game Over scene
 
 window.onload = function () {
   const config = {
@@ -6,7 +8,7 @@ window.onload = function () {
     width: 800,
     height: 600,
     parent: 'gameContainer', // Use parent instead of canvas
-    scene: [MenuScene, MainGameScene], // Add both scenes
+    scene: [MenuScene, MainGameScene, GameOverScene], // Add both scenes
     physics: {
       default: 'arcade',
       arcade: {
@@ -58,6 +60,7 @@ class MenuScene extends Phaser.Scene {
 class MainGameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainGameScene' });
+    this.overlapTimer = null; // Initialize the overlap timer
   }
 
   preload() {
@@ -65,6 +68,10 @@ class MainGameScene extends Phaser.Scene {
     this.load.spritesheet("player", "assets/player.png", {
       frameWidth: 32, // Width of each frame
       frameHeight: 32.5 // Height of each frame
+    });
+    this.load.spritesheet("enemy", "assets/zombie.png",{
+      frameWidth:  318,// Width of each frame
+      frameHeight: 294// Height of each frame
     });
   }
 
@@ -94,9 +101,38 @@ class MainGameScene extends Phaser.Scene {
     camera.startFollow(this.player); // Make the camera follow the player
     camera.setZoom(2); // Zoom in (2x zoom)
     camera.setBounds(0, 0, 2000, 2000); // Set camera bounds to match the map size
+
+    // Create an enemy
+    this.enemy = new Enemy(this, 500, 300, 'enemy');
+    this.enemy.setScale(0.2); // Adjust the scale as needed (e.g., 0.5 for half size)
+    // Add overlap check
+    this.physics.add.overlap(this.player, this.enemy, this.handleOverlap, null, this);
+  }
+
+  handleOverlap(player, enemy) {
+    if (!this.overlapTimer) {
+      this.overlapTimer = this.time.addEvent({
+        delay: 3000, // 3 seconds
+        callback: this.gameOver,
+        callbackScope: this
+      });
+    }
+  }
+
+  gameOver() {
+    this.scene.start('GameOverScene'); // Switch to the Game Over scene
   }
 
   update() {
-    this.player.update(this.cursors); // Use 'this.player' instead of 'player'
-}
+    this.player.update(this.cursors);
+    this.enemy.update(this.player);
+
+    // Reset the timer if the enemy is no longer overlapping with the player
+    if (!this.physics.overlap(this.player, this.enemy)) {
+      if (this.overlapTimer) {
+        this.overlapTimer.remove();
+        this.overlapTimer = null;
+      }
+    }
+  }
 }
