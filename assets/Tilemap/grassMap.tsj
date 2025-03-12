@@ -1,0 +1,14 @@
+{ "columns":7,
+ "image":"P2\/P2game\/assets\/Tilemap\/tileset_terrain_grass.png",
+ "imageheight":80,
+ "imagewidth":160,
+ "margin":1,
+ "name":"grassMap",
+ "spacing":1,
+ "tilecount":21,
+ "tiledversion":"1.11.2",
+ "tileheight":20,
+ "tilewidth":20,
+ "type":"tileset",
+ "version":"1.10"
+}

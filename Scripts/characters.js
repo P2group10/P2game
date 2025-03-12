@@ -50,7 +50,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       });
     scene.anims.create({
         key:'crawling',
-        frames: scene.anims.generateFrameNumbers('player', { start: 53, end: 57 }),
+        frames: scene.anims.generateFrameNumbers('player', { start: 73, end: 77 }),
         frameRate: 20,
     });
   }

@@ -29,7 +29,7 @@ class MenuScene extends Phaser.Scene {
   preload() {
     // Load any assets needed for the menu (e.g., background, button images)
     this.load.image('menuBackground', 'assets/menuBackground.jpg');
-    this.load.image('startButton', 'assets/startButton.webp');
+    this.load.image('startButton', 'assets/startButton.png');
   }
 
   create() {
@@ -38,7 +38,7 @@ class MenuScene extends Phaser.Scene {
 
     // Add Start Game button
     const startButton = this.add.image(400, 400, 'startButton').setInteractive();
-    startButton.setScale(0.1);
+    startButton.setScale(0.25);
 
     // Add button click event
     startButton.on('pointerdown', () => {
@@ -51,7 +51,7 @@ class MenuScene extends Phaser.Scene {
     });
 
     startButton.on('pointerout', () => {
-      startButton.setScale(0.1); // Reset the button size
+      startButton.setScale(0.25); // Reset the button size
     });
   }
 }
@@ -69,9 +69,9 @@ class MainGameScene extends Phaser.Scene {
       frameWidth: 32, // Width of each frame
       frameHeight: 32.5 // Height of each frame
     });
-    this.load.spritesheet("enemy", "assets/zombie.png",{
-      frameWidth:  318,// Width of each frame
-      frameHeight: 294// Height of each frame
+    this.load.spritesheet("enemy", "assets/zombie.png", {
+      frameWidth: 318, // Width of each frame
+      frameHeight: 294 // Height of each frame
     });
   }
 
@@ -105,8 +105,26 @@ class MainGameScene extends Phaser.Scene {
     // Create an enemy
     this.enemy = new Enemy(this, 500, 300, 'enemy');
     this.enemy.setScale(0.2); // Adjust the scale as needed (e.g., 0.5 for half size)
+
     // Add overlap check
     this.physics.add.overlap(this.player, this.enemy, this.handleOverlap, null, this);
+
+    // Create mini-map
+    this.createMiniMap();
+  }
+
+  createMiniMap() {
+    // Create a mini-map camera
+    this.miniMapCamera = this.cameras.add(650, 450, 150, 150).setZoom(0.1).setBounds(0, 0, 2000, 2000);
+    //this.miniMapCamera.ignore(this.player); // Ignore the player sprite in the mini-map
+
+    // Create a mini-map background (optional, for better visualization)
+    this.miniMapBackground = this.add.rectangle(650, 450, 150, 150, 0x000000, 0.5).setScrollFactor(0);
+    this.miniMapCamera.ignore(this.miniMapBackground);
+
+    // Add a player marker to the mini-map
+    this.playerMarker = this.add.rectangle(0, 0, 5, 5, 0xff0000).setScrollFactor(0);
+    this.miniMapCamera.ignore(this.playerMarker); // Ensure the marker is only visible in the mini-map
   }
 
   handleOverlap(player, enemy) {
@@ -126,6 +144,11 @@ class MainGameScene extends Phaser.Scene {
   update() {
     this.player.update(this.cursors);
     this.enemy.update(this.player);
+
+    // Update the player marker position on the mini-map
+    const miniMapX = (this.player.x / 2000) * 150; // Scale player's X position to mini-map size
+    const miniMapY = (this.player.y / 2000) * 150; // Scale player's Y position to mini-map size
+    this.playerMarker.setPosition(650 + miniMapX, 450 + miniMapY);
 
     // Reset the timer if the enemy is no longer overlapping with the player
     if (!this.physics.overlap(this.player, this.enemy)) {
