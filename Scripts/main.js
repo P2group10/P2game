@@ -1,14 +1,12 @@
-window.onload = function() {
+import Player from './characters.js'; // Import the Player class
+
+window.onload = function () {
   const config = {
     type: Phaser.WEBGL, // or Phaser.CANVAS
     width: 800,
     height: 600,
     parent: 'gameContainer', // Use parent instead of canvas
-    scene: {
-      preload: preload,
-      create: create,
-      update: update
-    },
+    scene: [MenuScene, MainGameScene], // Add both scenes
     physics: {
       default: 'arcade',
       arcade: {
@@ -20,95 +18,85 @@ window.onload = function() {
   var game = new Phaser.Game(config);
 };
 
-let player;
-let cursors;
-
-function preload() {
-  this.load.image("background", "assets/background.png");
-  this.load.spritesheet("player", "assets/player.png", {
-    frameWidth: 32, // Width of each frame
-    frameHeight: 33 // Height of each frame
-  });
-}
-
-function create() {
-  // Background
-  let background = this.add.image(400, 300, "background");
-  background.setScale(3);
-
-  // Player
-  player = this.physics.add.sprite(400, 300, "player").setScale(1.5); // Create the player sprite
-  player.setCollideWorldBounds(true); // Prevent the player from moving out of bounds
-
-  // Set world bounds to match the map size
-  this.physics.world.setBounds(60, 60, 1400, 970);
-
-  // Define animations
-  this.anims.create({
-    key: 'left',
-    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 13 }),
-    frameRate: 10,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'up',
-    frames: this.anims.generateFrameNumbers('player', { start: 43, end: 45 }),
-    frameRate: 20
-  });
-  this.anims.create({
-    key: 'down',
-    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 13 }),
-    frameRate: 20
-  });
-
-  this.anims.create({
-    key: 'right',
-    frames: this.anims.generateFrameNumbers('player', { start: 10, end: 13 }),
-    frameRate: 20,
-    repeat: -1
-  });
-
-  this.anims.create({
-    key: 'idle',
-    frames: this.anims.generateFrameNumbers('player', { start: 41, end: 42 }),
-    frameRate: 5,
-  });
-
-  // Controls
-  cursors = this.input.keyboard.addKeys({
-    w: Phaser.Input.Keyboard.KeyCodes.W,
-    a: Phaser.Input.Keyboard.KeyCodes.A,
-    s: Phaser.Input.Keyboard.KeyCodes.S,
-    d: Phaser.Input.Keyboard.KeyCodes.D
-  });
-}
-
-function update() {
-  // Player Movement
-  if (cursors.a.isDown) {
-    player.setVelocityX(-160);
-    player.flipX = true; // Flip the sprite for left movement
-    player.anims.play('right', true); // Use the 'right' animation for left movement
-  } else if (cursors.d.isDown) {
-    player.setVelocityX(160);
-    player.flipX = false; // Reset the flip for right movement
-    player.anims.play('right', true); // Play the 'right' animation
-  } else if (cursors.w.isDown) {
-    player.setVelocityY(-160);
-    player.anims.play('up', true);
-  } else if (cursors.s.isDown) {
-    player.setVelocityY(160);
-    player.anims.play('down', true);
-  } else {
-    player.setVelocityX(0);
-    player.setVelocityY(0);
-    player.anims.play('idle', true); // Play idle animation
+// Menu Scene
+class MenuScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'MenuScene' });
   }
 
-// Camera setup
-const camera = this.cameras.main;
-  camera.startFollow(player); // Make the camera follow the player
-  camera.setZoom(2); // Zoom in (2x zoom)
-  camera.setBounds(0, 0, 2000, 2000); // Set camera bounds to match the map size
+  preload() {
+    // Load any assets needed for the menu (e.g., background, button images)
+    this.load.image('menuBackground', 'assets/menuBackground.jpg');
+    this.load.image('startButton', 'assets/startButton.webp');
+  }
+
+  create() {
+    // Add background
+    this.add.image(450, 800, 'menuBackground').setScale(0.5);
+
+    // Add Start Game button
+    const startButton = this.add.image(400, 400, 'startButton').setInteractive();
+    startButton.setScale(0.1);
+
+    // Add button click event
+    startButton.on('pointerdown', () => {
+      this.scene.start('MainGameScene'); // Switch to the main game scene
+    });
+
+    // Optional: Add hover effects
+    startButton.on('pointerover', () => {
+      startButton.setScale(0.3); // Slightly enlarge the button
+    });
+
+    startButton.on('pointerout', () => {
+      startButton.setScale(0.1); // Reset the button size
+    });
+  }
+}
+
+// Main Game Scene
+class MainGameScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'MainGameScene' });
+  }
+
+  preload() {
+    this.load.image("background", "assets/background.png");
+    this.load.spritesheet("player", "assets/player.png", {
+      frameWidth: 32, // Width of each frame
+      frameHeight: 32.5 // Height of each frame
+    });
+  }
+
+  create() {
+    // Background
+    let background = this.add.image(400, 300, "background");
+    background.setScale(3);
+
+    // Create the player
+    this.player = new Player(this, 400, 300, "player");
+
+    // Set world bounds to match the map size
+    this.physics.world.setBounds(60, 60, 1400, 970);
+
+    // Controls
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      control: Phaser.Input.Keyboard.KeyCodes.CTRL
+    });
+
+    // Camera setup
+    const camera = this.cameras.main;
+    camera.startFollow(this.player); // Make the camera follow the player
+    camera.setZoom(2); // Zoom in (2x zoom)
+    camera.setBounds(0, 0, 2000, 2000); // Set camera bounds to match the map size
+  }
+
+  update() {
+    this.player.update(this.cursors); // Use 'this.player' instead of 'player'
+}
 }
