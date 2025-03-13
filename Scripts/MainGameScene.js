@@ -8,8 +8,8 @@ export default class MainGameScene extends Phaser.Scene {
     this.overlapTimer = null; // Initialize the overlap timer
     this.isMiniMapVisible = true; // Track mini-map visibility
     this.zombies = []; // Array to store active zombies
-    this.maxZombies = 2000; // Maximum number of zombies allowed
-    this.spawnInterval = 10; // Spawn a new zombie every 2 seconds
+    this.maxZombies = 20; // Maximum number of zombies allowed
+    this.spawnInterval = 500; // Spawn a new zombie every 2 seconds
   }
 
   preload() {

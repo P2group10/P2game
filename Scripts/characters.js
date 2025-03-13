@@ -83,11 +83,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
     if (cursors.control.isDown){
         if (cursors.a.isDown) {
-            this.setVelocityX(-160);
+            this.setVelocityX(-300);
             this.flipX = true; // Flip the sprite for left movement
             this.anims.play('crawling', true); // Use the 'right' animation for left movement
           } else if (cursors.d.isDown) {
-            this.setVelocityX(160);
+            this.setVelocityX(300);
             this.flipX = false; // Reset the flip for right movement
             this.anims.play('crawling', true); // Play the 'right' animation
           }
