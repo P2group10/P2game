@@ -44,53 +44,52 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     });
     scene.anims.create({
         key: 'cute',
-        frames: scene.anims.generateFrameNumbers('player', { start: 50, end: 52 }),
-        frameRate: 1,
+        frames: scene.anims.generateFrameNumbers('player', { start: 50, end: 51 }),
+        frameRate: 5,
         repeat: -1
       });
     scene.anims.create({
         key:'crawling',
-        frames: scene.anims.generateFrameNumbers('player', { start: 73, end: 77 }),
+        frames: scene.anims.generateFrameNumbers('player', { start: 73, end: 75 }),
         frameRate: 20,
+        repeat: -1
     });
   }
 
   update(cursors) {
     // Player Movement
-    if (cursors.a.isDown) {
-      this.setVelocityX(-160);
-      this.flipX = true; // Flip the sprite for left movement
-      this.anims.play('right', true); // Use the 'right' animation for left movement
+    if (cursors.shift.isDown){
+      if (cursors.a.isDown) {
+          this.setVelocityX(-300);
+          this.flipX = true; // Flip the sprite for left movement
+          this.anims.play('crawling', true); // Use the 'right' animation for left movement
+        } else if (cursors.d.isDown) {
+          this.setVelocityX(300);
+          this.flipX = false; // Reset the flip for right movement
+          this.anims.play('crawling', true); // Play the 'right' animation
+        }
+    } else if (cursors.a.isDown) {
+        this.setVelocityX(-160);
+        this.flipX = true; // Flip the sprite for left movement
+        this.anims.play('right', true); // Use the 'right' animation for left movement
     } else if (cursors.d.isDown) {
-      this.setVelocityX(160);
-      this.flipX = false; // Reset the flip for right movement
-      this.anims.play('right', true); // Play the 'right' animation
+        this.setVelocityX(160);
+        this.flipX = false; // Reset the flip for right movement
+        this.anims.play('right', true); // Play the 'right' animation
     } else if (cursors.w.isDown) {
-      this.setVelocityY(-160);
-      this.anims.play('up', true);
+        this.setVelocityY(-160);
+        this.anims.play('up', true);
     } else if (cursors.s.isDown) {
-      this.setVelocityY(160);
-      this.anims.play('down', true);
-    } else {
-      this.setVelocityX(0);
-      this.setVelocityY(0);
-      this.anims.play('idle', true); // Play idle animation
-    }
-    if (cursors.space.isDown){
+        this.setVelocityY(160);
+        this.anims.play('down', true);
+    } else if (cursors.space.isDown){
         this.setVelocityX(0);
         this.setVelocityY(0);
-      this.anims.play('cute', true);
-    }
-    if (cursors.control.isDown){
-        if (cursors.a.isDown) {
-            this.setVelocityX(-300);
-            this.flipX = true; // Flip the sprite for left movement
-            this.anims.play('crawling', true); // Use the 'right' animation for left movement
-          } else if (cursors.d.isDown) {
-            this.setVelocityX(300);
-            this.flipX = false; // Reset the flip for right movement
-            this.anims.play('crawling', true); // Play the 'right' animation
-          }
+        this.anims.play('cute', true);
+    } else {
+        this.setVelocityX(0);
+        this.setVelocityY(0);
+        this.anims.play('idle', true); // Play idle animation
     }
   }
 }

@@ -42,7 +42,7 @@ export default class MainGameScene extends Phaser.Scene {
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      control: Phaser.Input.Keyboard.KeyCodes.CTRL
+      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT
     });
 
     // Add key listener for the M key to toggle mini-map
@@ -139,4 +139,12 @@ export default class MainGameScene extends Phaser.Scene {
       }
     }
   }
+  shutdown() {
+    // Clean up the scene when it is stopped
+    if (this.spawnTimer) {
+      this.spawnTimer.remove(); // Remove the spawn timer
+    }
+    this.zombies = []; // Clear the zombies array
+    this.overlapTimer = null; // Reset the overlap timer
+}
 }
