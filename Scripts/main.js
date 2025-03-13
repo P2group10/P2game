@@ -1,7 +1,8 @@
 // main.js
-import MenuScene from './MenuScene.js';
+import StartScene from './StartScene.js'; // Import the Start scene
 import MainGameScene from './MainGameScene.js';
 import GameOverScene from './GameOverScene.js';
+import InfoScene from './InfoScene.js'
 
 window.onload = function () {
   const config = {
@@ -9,7 +10,7 @@ window.onload = function () {
     width: 800,
     height: 600,
     parent: 'gameContainer', // Use parent instead of canvas
-    scene: [MenuScene, MainGameScene, GameOverScene], // Add both scenes
+    scene: [StartScene, InfoScene, MainGameScene, GameOverScene], // Ensure Start is the first scene
     physics: {
       default: 'arcade',
       arcade: {
