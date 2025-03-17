@@ -57,40 +57,63 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(cursors) {
-    // Player Movement
-    if (cursors.shift.isDown){
-      if (cursors.a.isDown) {
-          this.setVelocityX(-300);
-          this.flipX = true; // Flip the sprite for left movement
-          this.anims.play('crawling', true); // Use the 'right' animation for left movement
-        } else if (cursors.d.isDown) {
-          this.setVelocityX(300);
-          this.flipX = false; // Reset the flip for right movement
-          this.anims.play('crawling', true); // Play the 'right' animation
-        }
-    } else if (cursors.a.isDown) {
-        this.setVelocityX(-160);
-        this.flipX = true; // Flip the sprite for left movement
-        this.anims.play('right', true); // Use the 'right' animation for left movement
-    } else if (cursors.d.isDown) {
-        this.setVelocityX(160);
-        this.flipX = false; // Reset the flip for right movement
-        this.anims.play('right', true); // Play the 'right' animation
-    } else if (cursors.w.isDown) {
-        this.setVelocityY(-160);
-        this.anims.play('up', true);
-    } else if (cursors.s.isDown) {
-        this.setVelocityY(160);
+  let velocity = 160;
+  let crawlVelocity = 300;
+
+  if (cursors.shift.isDown) {
+    velocity = crawlVelocity;
+    this.anims.play('crawl', true);
+  }
+
+switch (true) {
+    case cursors.a.isDown && cursors.w.isDown:
+        this.setVelocity(-velocity, -velocity);
+        this.flipX = true;
+        this.anims.play('right', true);
+        break;
+    case cursors.a.isDown && cursors.s.isDown:
+        this.setVelocity(-velocity, velocity);
+        this.flipX = true;
         this.anims.play('down', true);
-    } else if (cursors.space.isDown){
-        this.setVelocityX(0);
-        this.setVelocityY(0);
+        break;
+    case cursors.d.isDown && cursors.w.isDown:
+        this.setVelocity(velocity, -velocity);
+        this.flipX = false;
+        this.anims.play('up', true);
+        break;
+    case cursors.d.isDown && cursors.s.isDown:
+        this.setVelocity(velocity, velocity);
+        this.flipX = false;
+        this.anims.play('down', true);
+        break;
+    case cursors.a.isDown:
+        this.setVelocityX(-velocity);
+        this.flipX = true;
+        this.anims.play('right', true);
+        break;
+    case cursors.d.isDown:
+        this.setVelocityX(velocity);
+        this.flipX = false;
+        this.anims.play('right', true);
+        break;
+    case cursors.w.isDown:
+        this.setVelocityY(-velocity);
+        this.anims.play('up', true);
+        break;
+    case cursors.s.isDown:
+        this.setVelocityY(velocity);
+        this.anims.play('down', true);
+        break;
+    case cursors.space.isDown:
+        this.setVelocity(0, 0);
         this.anims.play('cute', true);
-    } else {
-        this.setVelocityX(0);
-        this.setVelocityY(0);
-        this.anims.play('idle', true); // Play idle animation
+        break;
+    default:
+        this.setVelocity(0, 0);
+        this.anims.play('idle', true);
+        break;
     }
+    
   }
 }
 

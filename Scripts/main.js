@@ -1,16 +1,16 @@
 // main.js
-import StartScene from './StartScene.js'; // Import the Start scene
+import StartScene from './StartScene.js';
 import MainGameScene from './MainGameScene.js';
 import GameOverScene from './GameOverScene.js';
-import InfoScene from './InfoScene.js'
+import InfoScene from './InfoScene.js';
 
 window.onload = function () {
   const config = {
-    type: Phaser.WEBGL, // or Phaser.CANVAS
+    type: Phaser.WEBGL,
     width: 800,
     height: 600,
-    parent: 'gameContainer', // Use parent instead of canvas
-    scene: [StartScene, InfoScene, MainGameScene, GameOverScene], // Ensure Start is the first scene
+    parent: 'gameContainer',
+    scene: [StartScene, InfoScene, MainGameScene, GameOverScene],
     physics: {
       default: 'arcade',
       arcade: {
