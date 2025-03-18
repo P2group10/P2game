@@ -60,12 +60,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   let velocity = 160;
   let crawlVelocity = 300;
 
-  if (cursors.shift.isDown) {
-    velocity = crawlVelocity;
-    this.anims.play('crawl', true);
-  }
 
 switch (true) {
+    case cursors.shift.isDown && cursors.a.isDown:
+        this.setVelocityX(-crawlVelocity);
+        this.flipX = true;
+        this.anims.play('crawling', true);
+        break;
+    case cursors.shift.isDown && cursors.d.isDown:
+        this.setVelocityX(crawlVelocity);
+        this.flipX = false;
+        this.anims.play('crawling', true);
+        break;
     case cursors.a.isDown && cursors.w.isDown:
         this.setVelocity(-velocity, -velocity);
         this.flipX = true;
