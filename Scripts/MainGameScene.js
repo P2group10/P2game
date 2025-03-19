@@ -16,7 +16,7 @@ export default class MainGameScene extends Phaser.Scene {
     this.load.image('open_tileset', 'assets/Tilemap/open_tileset.png');
     this.load.tilemapTiledJSON('trialMap', 'assets/Tilemap/city.json');
     this.load.spritesheet("player", "assets/player.png", {
-      frameWidth: 31.2,
+      frameWidth: 31,
       frameHeight: 32.3
     });
     this.load.spritesheet("enemy", "assets/zombie.png", {
@@ -40,23 +40,25 @@ export default class MainGameScene extends Phaser.Scene {
   const buldingLayer = map.createLayer('building', tileset, 0, 0);
   const boxLayer = map.createLayer('boxes', tileset, 0, 0);
   const fencesLayer = map.createLayer('fences', tileset, 0, 0);
+  const doorsLayer = map.createLayer('doors', tileset, 0, 0);
+    fencesLayer.setCollisionByExclusion([-1]);
+    buldingLayer.setCollisionByExclusion([-1]);
+    boxLayer.setCollisionByExclusion([-1]);
+    treea01Layer.setCollisionByExclusion([-1]);
 
-  
-  // Adding collision to certain layers
-  map.setCollision([], true, fencesLayer);
-  if (!fencesLayer) {
-    console.error('Fences layer not found! Check the layer name in Tiled.');
-    return;
-  }
 
 
     // Create the player
     this.player = new Player(this, 800, 700, "player");
-    if (!this.player) {
-        console.error('Player object not initialized!');
-        return;
-      }
+
     this.physics.add.collider(this.player, fencesLayer);
+    this.physics.add.collider(this.player, buldingLayer);
+    this.physics.add.collider(this.player, boxLayer);
+    this.physics.add.collider(this.player, treea01Layer);
+    this.physics.add.collider(this.zombies, fencesLayer);
+    this.physics.add.collider(this.zombies, buldingLayer);
+    this.physics.add.collider(this.zombies, boxLayer);
+    this.physics.add.collider(this.zombies, treea01Layer);
 
     // Adds collidition between the zombies and the player
     this.physics.add.collider(this.player, this.zombies);
@@ -118,8 +120,8 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   createMiniMap() {
-    this.miniMapCamera = this.cameras.add(500, 300, 300, 300).setZoom(0.2).setBounds(0, 0, 2000, 2000);
-    this.playerMarker = this.add.rectangle(0, 0, 5, 5, 0xff0000).setScrollFactor(0);
+    this.miniMapCamera = this.cameras.add(500, 300, 300, 300).setZoom(0.5).setBounds(0, 0, 2000, 2000);
+    this.miniMapCamera.startFollow(this.player);
   }
 
   toggleMiniMap() {

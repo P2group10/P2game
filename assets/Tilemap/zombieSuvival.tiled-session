@@ -36,16 +36,20 @@
             "scaleInDock": 2.5467
         },
         "city.json": {
-            "scale": 0.3054,
-            "selectedLayer": 0,
+            "scale": 1.0461,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 1237.721021611002,
-                "y": 938.1139489194499
+                "x": 544.4030207437147,
+                "y": 319.2811394704139
             }
         },
         "city.json#open_tileset": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 0.6829
+        },
+        "open_tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
     "last.imagePath": "/Users/mathiaskeinicke/P2/P2game/assets/Tilemap",
@@ -55,6 +59,7 @@
     "project": "zombieSuvival.tiled-project",
     "recentFiles": [
         "city.json",
+        "open_tileset.tsx",
         "TrialMap.tmj"
     ],
     "tileset.lastUsedFormat": "tsx"
