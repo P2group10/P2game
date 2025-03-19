@@ -1,10 +1,10 @@
 // MainGameScene.js
-import Player from './characters.js';
-import Enemy from './enemies.js';
+import Player from "./characters.js";
+import Enemy from "./enemies.js";
 
 export default class MainGameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'MainGameScene' });
+    super({ key: "MainGameScene" });
     this.overlapTimer = null;
     this.isMiniMapVisible = true;
     this.zombies = [];
@@ -16,12 +16,21 @@ export default class MainGameScene extends Phaser.Scene {
     this.load.image('open_tileset', 'assets/Tilemap/open_tileset.png');
     this.load.tilemapTiledJSON('trialMap', 'assets/Tilemap/city.json');
     this.load.spritesheet("player", "assets/player.png", {
+<<<<<<< HEAD
       frameWidth: 31,
       frameHeight: 32.3
     });
     this.load.spritesheet("enemy", "assets/zombie.png", {
       frameWidth: 270,
       frameHeight: 290
+=======
+      frameWidth: 32,
+      frameHeight: 32.5,
+    });
+    this.load.spritesheet("enemy", "assets/zombies.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+>>>>>>> 15d71cc (Changed zombies and their movement)
     });
   }
 
@@ -81,11 +90,11 @@ export default class MainGameScene extends Phaser.Scene {
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT
+      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
     });
 
     // Toggle mini-map with M key
-    this.input.keyboard.on('keydown-M', () => {
+    this.input.keyboard.on("keydown-M", () => {
       this.toggleMiniMap();
     });
 
@@ -100,7 +109,7 @@ export default class MainGameScene extends Phaser.Scene {
       delay: this.spawnInterval,
       callback: this.spawnZombie,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
 
     // Create mini-map
@@ -111,17 +120,38 @@ export default class MainGameScene extends Phaser.Scene {
     if (this.zombies.length < this.maxZombies) {
       const x = Phaser.Math.Between(500, 600);
       const y = Phaser.Math.Between(100, 450);
+<<<<<<< HEAD
       const zombie = new Enemy(this, x, y, 'enemy');
       zombie.setScale(0.1);
+=======
+      const zombie = new Enemy(this, x, y, "enemy");
+      zombie.setScale(1);
+>>>>>>> 15d71cc (Changed zombies and their movement)
 
-      this.physics.add.overlap(this.player, zombie, this.handleOverlap, null, this);
+      this.physics.add.overlap(
+        this.player,
+        zombie,
+        this.handleOverlap,
+        null,
+        this
+      );
       this.zombies.push(zombie);
     }
   }
 
   createMiniMap() {
+<<<<<<< HEAD
     this.miniMapCamera = this.cameras.add(500, 300, 300, 300).setZoom(0.5).setBounds(0, 0, 2000, 2000);
     this.miniMapCamera.startFollow(this.player);
+=======
+    this.miniMapCamera = this.cameras
+      .add(500, 300, 300, 300)
+      .setZoom(0.2)
+      .setBounds(0, 0, 2000, 2000);
+    this.playerMarker = this.add
+      .rectangle(0, 0, 5, 5, 0xff0000)
+      .setScrollFactor(0);
+>>>>>>> 15d71cc (Changed zombies and their movement)
   }
 
   toggleMiniMap() {
@@ -136,24 +166,26 @@ export default class MainGameScene extends Phaser.Scene {
       this.overlapTimer = this.time.addEvent({
         delay: 3000,
         callback: this.gameOver,
-        callbackScope: this
+        callbackScope: this,
       });
     }
   }
 
   gameOver() {
-    this.scene.start('GameOverScene');
+    this.scene.start("GameOverScene");
   }
 
   update() {
     this.player.update(this.cursors);
 
-    this.zombies.forEach(zombie => {
+    this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
 
 
-    if (!this.zombies.some(zombie => this.physics.overlap(this.player, zombie))) {
+    if (
+      !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
+    ) {
       if (this.overlapTimer) {
         this.overlapTimer.remove();
         this.overlapTimer = null;
