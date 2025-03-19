@@ -16,21 +16,12 @@ export default class MainGameScene extends Phaser.Scene {
     this.load.image('open_tileset', 'assets/Tilemap/open_tileset.png');
     this.load.tilemapTiledJSON('trialMap', 'assets/Tilemap/city.json');
     this.load.spritesheet("player", "assets/player.png", {
-<<<<<<< HEAD
-      frameWidth: 31,
-      frameHeight: 32.3
-    });
-    this.load.spritesheet("enemy", "assets/zombie.png", {
-      frameWidth: 270,
-      frameHeight: 290
-=======
       frameWidth: 32,
       frameHeight: 32.5,
     });
     this.load.spritesheet("enemy", "assets/zombies.png", {
       frameWidth: 64,
       frameHeight: 64,
->>>>>>> 15d71cc (Changed zombies and their movement)
     });
   }
 
@@ -51,6 +42,7 @@ export default class MainGameScene extends Phaser.Scene {
   const building2Layer = map.createLayer('building walk through', tileset, 0, 0);
   const boxLayer = map.createLayer('boxes', tileset, 0, 0);
   const fencesLayer = map.createLayer('fences', tileset, 0, 0);
+  const doorsLayer = map.createLayer('doors', tileset, 0, 0);
 
   this.building2Layer = building2Layer;
 
@@ -58,6 +50,7 @@ export default class MainGameScene extends Phaser.Scene {
   buildingLayer.setCollisionByExclusion([-1]);
   boxLayer.setCollisionByExclusion([-1]);
   treea01Layer.setCollisionByExclusion([-1]);
+
 
 
     // Create the player
@@ -94,9 +87,11 @@ export default class MainGameScene extends Phaser.Scene {
       d: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
     });
 
     // Toggle mini-map with M key
+    this.input.keyboard.on("keydown-M", () => {
     this.input.keyboard.on("keydown-M", () => {
       this.toggleMiniMap();
     });
@@ -113,6 +108,7 @@ export default class MainGameScene extends Phaser.Scene {
       callback: this.spawnZombie,
       callbackScope: this,
       loop: true,
+      loop: true,
     });
 
     // Create mini-map
@@ -123,14 +119,16 @@ export default class MainGameScene extends Phaser.Scene {
     if (this.zombies.length < this.maxZombies) {
       const x = Phaser.Math.Between(500, 600);
       const y = Phaser.Math.Between(100, 450);
-<<<<<<< HEAD
-      const zombie = new Enemy(this, x, y, 'enemy');
-      zombie.setScale(0.1);
-=======
       const zombie = new Enemy(this, x, y, "enemy");
       zombie.setScale(1);
->>>>>>> 15d71cc (Changed zombies and their movement)
 
+      this.physics.add.overlap(
+        this.player,
+        zombie,
+        this.handleOverlap,
+        null,
+        this
+      );
       this.physics.add.overlap(
         this.player,
         zombie,
@@ -170,17 +168,20 @@ export default class MainGameScene extends Phaser.Scene {
         delay: 3000,
         callback: this.gameOver,
         callbackScope: this,
+        callbackScope: this,
       });
     }
   }
 
   gameOver() {
     this.scene.start("GameOverScene");
+    this.scene.start("GameOverScene");
   }
 
   update() {
     this.player.update(this.cursors);
 
+    this.zombies.forEach((zombie) => {
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
@@ -189,20 +190,22 @@ export default class MainGameScene extends Phaser.Scene {
     if (
       !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
     ) {
+    if (
+      !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
+    ) {
       if (this.overlapTimer) {
         this.overlapTimer.remove();
         this.overlapTimer = null;
       }
     }
-
     const playerTile = this.building2Layer.worldToTileXY(this.player.x, this.player.y);
     const tile = this.building2Layer.getTileAt(playerTile.x, playerTile.y);
   
     if (tile) {
-    // Player is walking through the building2Layer, lower opacity
+      // Player is walking through the building2Layer, lower opacity
       this.building2Layer.setAlpha(0.5); // Set opacity to 50%
     } else {
-    // Player is not walking through the building2Layer, reset opacity
+      // Player is not walking through the building2Layer, reset opacity
       this.building2Layer.setAlpha(1); // Set opacity to 100%
     }
   }
@@ -215,3 +218,4 @@ export default class MainGameScene extends Phaser.Scene {
     this.overlapTimer = null;
   }
 }
+
