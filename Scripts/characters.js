@@ -62,51 +62,51 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
 
 switch (true) {
-    case cursors.shift.isDown && cursors.a.isDown:
+    case cursors.shift.isDown && cursors.a.isDown || cursors.shift.isDown && cursors.left.isDown:
         this.setVelocityX(-crawlVelocity);
         this.flipX = true;
         this.anims.play('crawling', true);
         break;
-    case cursors.shift.isDown && cursors.d.isDown:
+    case cursors.shift.isDown && cursors.d.isDown || cursors.shift.isDown && cursors.right.isDown:
         this.setVelocityX(crawlVelocity);
         this.flipX = false;
         this.anims.play('crawling', true);
         break;
-    case cursors.a.isDown && cursors.w.isDown:
+    case cursors.a.isDown && cursors.w.isDown || cursors.left.isDown && cursors.up.isDown:
         this.setVelocity(-velocity, -velocity);
         this.flipX = true;
         this.anims.play('right', true);
         break;
-    case cursors.a.isDown && cursors.s.isDown:
+    case cursors.a.isDown && cursors.s.isDown || cursors.left.isDown && cursors.down.isDown:
         this.setVelocity(-velocity, velocity);
         this.flipX = true;
         this.anims.play('down', true);
         break;
-    case cursors.d.isDown && cursors.w.isDown:
+    case cursors.d.isDown && cursors.w.isDown || cursors.right.isDown && cursors.up.isDown:
         this.setVelocity(velocity, -velocity);
         this.flipX = false;
         this.anims.play('up', true);
         break;
-    case cursors.d.isDown && cursors.s.isDown:
+    case cursors.d.isDown && cursors.s.isDown || cursors.right.isDown && cursors.down.isDown:
         this.setVelocity(velocity, velocity);
         this.flipX = false;
         this.anims.play('down', true);
         break;
-    case cursors.a.isDown:
+    case cursors.a.isDown || cursors.left.isDown:
         this.setVelocityX(-velocity);
         this.flipX = true;
         this.anims.play('right', true);
         break;
-    case cursors.d.isDown:
+    case cursors.d.isDown || cursors.right.isDown:
         this.setVelocityX(velocity);
         this.flipX = false;
         this.anims.play('right', true);
         break;
-    case cursors.w.isDown:
+    case cursors.w.isDown || cursors.up.isDown:
         this.setVelocityY(-velocity);
         this.anims.play('up', true);
         break;
-    case cursors.s.isDown:
+    case cursors.s.isDown || cursors.down.isDown:
         this.setVelocityY(velocity);
         this.anims.play('down', true);
         break;

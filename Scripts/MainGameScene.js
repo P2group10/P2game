@@ -46,6 +46,7 @@ export default class MainGameScene extends Phaser.Scene {
   const doorsLayer = map.createLayer('doors', tileset, 0, 0);
 
   this.building2Layer = building2Layer;
+  this.doorsLayer = doorsLayer;
 
   fencesLayer.setCollisionByExclusion([-1]);
   buildingLayer.setCollisionByExclusion([-1]);
@@ -82,6 +83,10 @@ export default class MainGameScene extends Phaser.Scene {
       a: Phaser.Input.Keyboard.KeyCodes.A,
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
+      right : Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      left : Phaser.Input.Keyboard.KeyCodes.LEFT,
+      up : Phaser.Input.Keyboard.KeyCodes.UP,
+      down : Phaser.Input.Keyboard.KeyCodes.DOWN,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
@@ -104,7 +109,6 @@ export default class MainGameScene extends Phaser.Scene {
       callback: this.spawnZombie,
       callbackScope: this,
       loop: true,
-      loop: true,
     });
 
     // Create mini-map
@@ -118,13 +122,6 @@ export default class MainGameScene extends Phaser.Scene {
       const zombie = new Enemy(this, x, y, "enemy");
       zombie.setScale(0.5);
 
-      this.physics.add.overlap(
-        this.player,
-        zombie,
-        this.handleOverlap,
-        null,
-        this
-      );
       this.physics.add.overlap(
         this.player,
         zombie,
@@ -180,15 +177,20 @@ export default class MainGameScene extends Phaser.Scene {
       }
     }
     const playerTile = this.building2Layer.worldToTileXY(this.player.x, this.player.y);
-    const tile = this.building2Layer.getTileAt(playerTile.x, playerTile.y);
-  
-    if (tile) {
-      // Player is walking through the building2Layer, lower opacity
-      this.building2Layer.setAlpha(0.5); // Set opacity to 50%
+    const rooftile = this.building2Layer.getTileAt(playerTile.x, playerTile.y);
+    const doortile = this.doorsLayer.getTileAt(playerTile.x, playerTile.y);
+    
+    if (rooftile) {
+      this.building2Layer.setAlpha(0.5); 
     } else {
-      // Player is not walking through the building2Layer, reset opacity
-      this.building2Layer.setAlpha(1); // Set opacity to 100%
+      this.building2Layer.setAlpha(1); 
     }
+    if (doortile) {
+      this.doorsLayer.setAlpha(0.5); 
+    } else {
+      this.doorsLayer.setAlpha(1);
+    }
+    
   }
 
   shutdown() {
