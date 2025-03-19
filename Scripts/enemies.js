@@ -24,7 +24,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   update(player, time) {
     const distanceToPlayer = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
-    const chaseDistance = 500;
+    const chaseDistance = 50;
 
     if (!this.scene || !this.scene.physics) {
       console.error("Scene or physics is undefined in Enemy update!");

@@ -1,0 +1,61 @@
+{
+    "activeFile": "city.json",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "#overworld": {
+            "scaleInEditor": 1
+        },
+        "#overworld3": {
+            "scaleInDock": 2.3078
+        },
+        "TrialMap.tmj": {
+            "scale": 0.81,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 275.9259259259259,
+                "y": 358.0246913580247
+            }
+        },
+        "TrialMap.tmj#overworld": {
+            "scaleInDock": 2.1217
+        },
+        "TrialMap2.tmj": {
+            "scale": 3.1109,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 444.4051560641615,
+                "y": 336.8800025716031
+            }
+        },
+        "TrialMap2.tmj#overworld4": {
+            "scaleInDock": 2.5467
+        },
+        "city.json": {
+            "scale": 0.3054,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1237.721021611002,
+                "y": 938.1139489194499
+            }
+        },
+        "city.json#open_tileset": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        }
+    },
+    "last.imagePath": "/Users/mathiaskeinicke/P2/P2game/assets/Tilemap",
+    "openFiles": [
+        "city.json"
+    ],
+    "project": "zombieSuvival.tiled-project",
+    "recentFiles": [
+        "city.json",
+        "TrialMap.tmj"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

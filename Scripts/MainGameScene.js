@@ -13,27 +13,64 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("background", "assets/background.png");
+    this.load.image('open_tileset', 'assets/Tilemap/open_tileset.png');
+    this.load.tilemapTiledJSON('trialMap', 'assets/Tilemap/city.json');
     this.load.spritesheet("player", "assets/player.png", {
-      frameWidth: 32,
-      frameHeight: 32.5
+      frameWidth: 31.2,
+      frameHeight: 32.3
     });
     this.load.spritesheet("enemy", "assets/zombie.png", {
-      frameWidth: 318,
-      frameHeight: 294
+      frameWidth: 270,
+      frameHeight: 290
     });
   }
 
   create() {
-    // Background
-    let background = this.add.image(400, 300, "background");
-    background.setScale(3);
+    // Create the tilemap
+  const map = this.make.tilemap({ key: 'trialMap' });
+
+  // Add the tileset image to the tilemap
+  const tileset = map.addTilesetImage('open_tileset', 'open_tileset');
+
+  // Create the layers from the tilemap
+  const groundLayer = map.createLayer('ground', tileset, 0, 0);
+  const treea01Layer = map.createLayer('trees 01', tileset, 0, 0);
+  const streetsLayer = map.createLayer('streets', tileset, 0, 0);
+  const sidewalksLayer = map.createLayer('sidewalks', tileset, 0, 0);
+  const buldingLayer = map.createLayer('building', tileset, 0, 0);
+  const boxLayer = map.createLayer('boxes', tileset, 0, 0);
+  const fencesLayer = map.createLayer('fences', tileset, 0, 0);
+
+  
+  // Adding collision to certain layers
+  map.setCollision([], true, fencesLayer);
+  if (!fencesLayer) {
+    console.error('Fences layer not found! Check the layer name in Tiled.');
+    return;
+  }
+
 
     // Create the player
     this.player = new Player(this, 800, 700, "player");
+    if (!this.player) {
+        console.error('Player object not initialized!');
+        return;
+      }
+    this.physics.add.collider(this.player, fencesLayer);
 
-    // Set world bounds
-    this.physics.world.setBounds(60, 60, 1400, 970);
+    // Adds collidition between the zombies and the player
+    this.physics.add.collider(this.player, this.zombies);
+
+    // Adds collidition between zombies, IDK why some zombies can still overlap, happens when player pushes one zombie into another
+    this.physics.add.collider(this.zombies, this.zombies);
+
+    // Set world bounds to match the tilemap size
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    // Set camera bounds to match the tilemap size
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
@@ -53,8 +90,8 @@ export default class MainGameScene extends Phaser.Scene {
     // Camera setup
     const camera = this.cameras.main;
     camera.startFollow(this.player);
-    camera.setZoom(1.5);
-    camera.setBounds(0, 0, 2000, 2000);
+    camera.setZoom(3);
+    camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     // Initialize zombie spawner
     this.spawnTimer = this.time.addEvent({
@@ -73,7 +110,7 @@ export default class MainGameScene extends Phaser.Scene {
       const x = Phaser.Math.Between(500, 600);
       const y = Phaser.Math.Between(100, 450);
       const zombie = new Enemy(this, x, y, 'enemy');
-      zombie.setScale(0.2);
+      zombie.setScale(0.1);
 
       this.physics.add.overlap(this.player, zombie, this.handleOverlap, null, this);
       this.zombies.push(zombie);
@@ -113,11 +150,6 @@ export default class MainGameScene extends Phaser.Scene {
       zombie.update(this.player);
     });
 
-    if (this.isMiniMapVisible) {
-      const miniMapX = (this.player.x / 2000) * 300;
-      const miniMapY = (this.player.y / 2000) * 300;
-      this.playerMarker.setPosition(600 + miniMapX, 400 + miniMapY);
-    }
 
     if (!this.zombies.some(zombie => this.physics.overlap(this.player, zombie))) {
       if (this.overlapTimer) {
