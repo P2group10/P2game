@@ -80,69 +80,69 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   // Diagonal running
   if (cursors.shift.isDown) {
-    if (cursors.a.isDown && cursors.w.isDown) {
+    if (cursors.a.isDown && cursors.w.isDown || cursors.left.isDown && cursors.up.isDown) {
       this.setVelocity(-crawlVelocity, -crawlVelocity);
       this.flipX = true;
       this.anims.play('sprint', true);
-    } else if (cursors.a.isDown && cursors.s.isDown) {
+    } else if (cursors.a.isDown && cursors.s.isDown || cursors.left.isDown && cursors.down.isDown) {
       this.setVelocity(-crawlVelocity, crawlVelocity);
       this.flipX = true;
       this.anims.play('sprint', true);
-    } else if (cursors.d.isDown && cursors.w.isDown) {
+    } else if (cursors.d.isDown && cursors.w.isDown || cursors.right.isDown && cursors.up.isDown) {
       this.setVelocity(crawlVelocity, -crawlVelocity);
       this.flipX = false;
       this.anims.play('sprint', true);
-    } else if (cursors.d.isDown && cursors.s.isDown) {
+    } else if (cursors.d.isDown && cursors.s.isDown || cursors.right.isDown && cursors.down.isDown) {
       this.setVelocity(crawlVelocity, crawlVelocity);
       this.flipX = false;
       this.anims.play('sprint', true);
-    } else if (cursors.a.isDown) {
+    } else if (cursors.a.isDown || cursors.left.isDown) {
       this.setVelocityX(-crawlVelocity);
       this.flipX = true;
       this.anims.play('sprint', true);
-    } else if (cursors.d.isDown) {
+    } else if (cursors.d.isDown || cursors.right.isDown) {
       this.setVelocityX(crawlVelocity);
       this.flipX = false;
       this.anims.play('sprint', true);
-    } else if (cursors.w.isDown) {
+    } else if (cursors.w.isDown || cursors.up.isDown) {
       this.setVelocityY(-crawlVelocity);
       this.anims.play('sprintUp', true);
-    } else if (cursors.s.isDown) {
+    } else if (cursors.s.isDown || cursors.down.isDown) {
       this.setVelocityY(crawlVelocity);
       this.anims.play('sprintDown', true);
     }
   } 
   // Diagonal walk
-  else if (cursors.a.isDown && cursors.w.isDown) {
+  else if (cursors.a.isDown && cursors.w.isDown || cursors.left.isDown && cursors.up.isDown) {
     this.setVelocity(-velocity, -velocity);
     this.flipX = true;
     this.anims.play('up', true);
-  } else if (cursors.a.isDown && cursors.s.isDown) {
+  } else if (cursors.a.isDown && cursors.s.isDown || cursors.left.isDown && cursors.down.isDown) {
     this.setVelocity(-velocity, velocity);
     this.flipX = true;
     this.anims.play('down', true);
-  } else if (cursors.d.isDown && cursors.w.isDown) {
+  } else if (cursors.d.isDown && cursors.w.isDown || cursors.right.isDown && cursors.up.isDown) {
     this.setVelocity(velocity, -velocity);
     this.flipX = false;
     this.anims.play('up', true);
-  } else if (cursors.d.isDown && cursors.s.isDown) {
+  } else if (cursors.d.isDown && cursors.s.isDown || cursors.right.isDown && cursors.down.isDown) {
     this.setVelocity(velocity, velocity);
     this.flipX = false;
     this.anims.play('down', true);
   } 
   // Straight walk
-  else if (cursors.a.isDown) {
+  else if (cursors.a.isDown || cursors.left.isDown) {
     this.setVelocityX(-velocity);
     this.flipX = true;
     this.anims.play('right', true);
-  } else if (cursors.d.isDown) {
+  } else if (cursors.d.isDown || cursors.right.isDown) {
     this.setVelocityX(velocity);
     this.flipX = false;
     this.anims.play('right', true);
-  } else if (cursors.w.isDown) {
+  } else if (cursors.w.isDown || cursors.up.isDown) {
     this.setVelocityY(-velocity);
     this.anims.play('up', true);
-  } else if (cursors.s.isDown) {
+  } else if (cursors.s.isDown || cursors.down.isDown) {
     this.setVelocityY(velocity);
     this.anims.play('down', true);
   } 

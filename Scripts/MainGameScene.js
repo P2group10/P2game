@@ -84,8 +84,11 @@ export default class MainGameScene extends Phaser.Scene {
       a: Phaser.Input.Keyboard.KeyCodes.A,
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
+      right : Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      left : Phaser.Input.Keyboard.KeyCodes.LEFT,
+      up : Phaser.Input.Keyboard.KeyCodes.UP,
+      down : Phaser.Input.Keyboard.KeyCodes.DOWN,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
     });
 
