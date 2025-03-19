@@ -1,18 +1,5 @@
-canvas {
-  border: 10px solid black;
-  padding-left: 0;
-  padding-right: 0;
-  /* margin-left: auto;
-  margin-right: auto; */
-  display: flex;
-  flex-direction: column;
-  /* position: absolute;
-  background-size: cover;
-  background-position: center; */
-}
-
 .gametitle {
-  color: blueviolet;
+  color: darkgreen;
   text-align: center;
   font-family: "Honk", system-ui;
   font-optical-sizing: auto;
@@ -20,19 +7,51 @@ canvas {
   font-style: normal;
   font-variation-settings: "MORF" 15, "SHLN" 50;
   font-size: 50px;
+  
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevents scrolling */
+}
+
+main {
+  flex: 1; /* Makes the main section take up all available space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .box {
-  height: 100vh;
-  background-color: black;
-  text-align: center;
-  width: 200px;
-  height: 250px;
-  float: left;
-  margin-left: 50px;
-  margin-right: 20px;
+  width: 300px;
+  height: 550px;
+  background-color: lightgray;
+  margin: 0 50px;
+  border-radius: 5%;
 }
-p,
-h1 {
+
+.boxText {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+#gameCanvas {
+  border: 1px solid lightgreen;
+  width: 800px;
+  height: 600px;
+  display: block; /* Fix display issue */
+  margin: auto; /* Centers the canvas */
+  background-color: transparent; /* Ensures no black background */
+}
+
+footer {
+  background-color: darkgreen;
   color: white;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
 }

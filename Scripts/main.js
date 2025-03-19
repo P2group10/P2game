@@ -1,12 +1,25 @@
-import player from "./player.js";
-const canvas = document.getElementById("gamearea");
-const ctx = canvas.getContext("2d");
+// main.js
+import StartScene from './StartScene.js';
+import MainGameScene from './MainGameScene.js';
+import GameOverScene from './GameOverScene.js';
+import InfoScene from './InfoScene.js';
 
-function clearScreen() {
-  ctx.fillStyle = "white";
-  ctx.fillRect = (0, 0, canvas.width, canvas.height);
-}
-
-function drawGame() {
-  drawPlayer();
-}
+window.onload = function () {
+  const config = {
+    type: Phaser.WEBGL,
+    width: 800,
+    height: 600,
+    parent: 'gameContainer',
+    scene: [StartScene, InfoScene, MainGameScene, GameOverScene],
+    pixelArt: true, // Set to false to enable anti-aliasing
+    roundPixels: true, // Round pixels to prevent sub-pixel rendering issues
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { y: 0 },
+        debug: true
+      }
+    }
+  };
+  var game = new Phaser.Game(config);
+};
