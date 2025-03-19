@@ -89,7 +89,6 @@ export default class MainGameScene extends Phaser.Scene {
 
     // Toggle mini-map with M key
     this.input.keyboard.on("keydown-M", () => {
-    this.input.keyboard.on("keydown-M", () => {
       this.toggleMiniMap();
     });
 
@@ -158,27 +157,20 @@ export default class MainGameScene extends Phaser.Scene {
         delay: 3000,
         callback: this.gameOver,
         callbackScope: this,
-        callbackScope: this,
       });
     }
   }
 
   gameOver() {
     this.scene.start("GameOverScene");
-    this.scene.start("GameOverScene");
   }
 
   update() {
     this.player.update(this.cursors);
-
-    this.zombies.forEach((zombie) => {
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
-
-    if (
-      !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
-    ) {
+    
     if (
       !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
     ) {
