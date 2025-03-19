@@ -27,34 +27,40 @@ export default class MainGameScene extends Phaser.Scene {
 
   create() {
     // Create the tilemap
-    const map = this.make.tilemap({ key: "trialMap" });
 
-    // Add the tileset image to the tilemap
-    const tileset = map.addTilesetImage("open_tileset", "open_tileset");
+  const map = this.make.tilemap({ key: 'trialMap' });
 
-    // Create the layers from the tilemap
-    const groundLayer = map.createLayer("ground", tileset, 0, 0);
-    const treea01Layer = map.createLayer("trees 01", tileset, 0, 0);
-    const streetsLayer = map.createLayer("streets", tileset, 0, 0);
-    const sidewalksLayer = map.createLayer("sidewalks", tileset, 0, 0);
-    const buldingLayer = map.createLayer("building", tileset, 0, 0);
-    const boxLayer = map.createLayer("boxes", tileset, 0, 0);
-    const fencesLayer = map.createLayer("fences", tileset, 0, 0);
-    const doorsLayer = map.createLayer("doors", tileset, 0, 0);
-    fencesLayer.setCollisionByExclusion([-1]);
-    buldingLayer.setCollisionByExclusion([-1]);
-    boxLayer.setCollisionByExclusion([-1]);
-    treea01Layer.setCollisionByExclusion([-1]);
+  // Add the tileset image to the tilemap
+  const tileset = map.addTilesetImage('open_tileset', 'open_tileset');
+
+  // Create the layers from the tilemap
+  const groundLayer = map.createLayer('ground', tileset, 0, 0);
+  const treea01Layer = map.createLayer('trees 01', tileset, 0, 0);
+  const treea02Layer = map.createLayer('trees non collide', tileset, 0, 0);
+  const streetsLayer = map.createLayer('streets', tileset, 0, 0);
+  const sidewalksLayer = map.createLayer('sidewalks', tileset, 0, 0);
+  const buildingLayer = map.createLayer('building', tileset, 0, 0);
+  const building2Layer = map.createLayer('building walk through', tileset, 0, 0);
+  const boxLayer = map.createLayer('boxes', tileset, 0, 0);
+  const fencesLayer = map.createLayer('fences', tileset, 0, 0);
+  const doorsLayer = map.createLayer('doors', tileset, 0, 0);
+
+  this.building2Layer = building2Layer;
+
+  fencesLayer.setCollisionByExclusion([-1]);
+  buildingLayer.setCollisionByExclusion([-1]);
+  boxLayer.setCollisionByExclusion([-1]);
+  treea01Layer.setCollisionByExclusion([-1]);
 
     // Create the player
     this.player = new Player(this, 800, 700, "player");
 
     this.physics.add.collider(this.player, fencesLayer);
-    this.physics.add.collider(this.player, buldingLayer);
+    this.physics.add.collider(this.player, buildingLayer);
     this.physics.add.collider(this.player, boxLayer);
     this.physics.add.collider(this.player, treea01Layer);
     this.physics.add.collider(this.zombies, fencesLayer);
-    this.physics.add.collider(this.zombies, buldingLayer);
+    this.physics.add.collider(this.zombies, buildingLayer);
     this.physics.add.collider(this.zombies, boxLayer);
     this.physics.add.collider(this.zombies, treea01Layer);
 
@@ -78,9 +84,11 @@ export default class MainGameScene extends Phaser.Scene {
       d: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
     });
 
     // Toggle mini-map with M key
+    this.input.keyboard.on("keydown-M", () => {
     this.input.keyboard.on("keydown-M", () => {
       this.toggleMiniMap();
     });
@@ -97,6 +105,7 @@ export default class MainGameScene extends Phaser.Scene {
       callback: this.spawnZombie,
       callbackScope: this,
       loop: true,
+      loop: true,
     });
 
     // Create mini-map
@@ -110,6 +119,13 @@ export default class MainGameScene extends Phaser.Scene {
       const zombie = new Enemy(this, x, y, "enemy");
       zombie.setScale(0.5);
 
+      this.physics.add.overlap(
+        this.player,
+        zombie,
+        this.handleOverlap,
+        null,
+        this
+      );
       this.physics.add.overlap(
         this.player,
         zombie,
@@ -142,11 +158,13 @@ export default class MainGameScene extends Phaser.Scene {
         delay: 3000,
         callback: this.gameOver,
         callbackScope: this,
+        callbackScope: this,
       });
     }
   }
 
   gameOver() {
+    this.scene.start("GameOverScene");
     this.scene.start("GameOverScene");
   }
 
@@ -154,9 +172,13 @@ export default class MainGameScene extends Phaser.Scene {
     this.player.update(this.cursors);
 
     this.zombies.forEach((zombie) => {
+    this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
 
+    if (
+      !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
+    ) {
     if (
       !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
     ) {
@@ -164,6 +186,16 @@ export default class MainGameScene extends Phaser.Scene {
         this.overlapTimer.remove();
         this.overlapTimer = null;
       }
+    }
+    const playerTile = this.building2Layer.worldToTileXY(this.player.x, this.player.y);
+    const tile = this.building2Layer.getTileAt(playerTile.x, playerTile.y);
+  
+    if (tile) {
+      // Player is walking through the building2Layer, lower opacity
+      this.building2Layer.setAlpha(0.5); // Set opacity to 50%
+    } else {
+      // Player is not walking through the building2Layer, reset opacity
+      this.building2Layer.setAlpha(1); // Set opacity to 100%
     }
   }
 
@@ -175,3 +207,4 @@ export default class MainGameScene extends Phaser.Scene {
     this.overlapTimer = null;
   }
 }
+
