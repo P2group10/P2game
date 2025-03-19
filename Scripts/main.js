@@ -16,16 +16,10 @@ window.onload = function () {
       default: "arcade",
       arcade: {
         gravity: { y: 0 },
-<<<<<<< HEAD
-        debug: true
-      }
-    }
-=======
         //Use debug: true when developing - remove for production
         debug: true,
       },
     },
->>>>>>> 15d71cc (Changed zombies and their movement)
   };
   var game = new Phaser.Game(config);
 };

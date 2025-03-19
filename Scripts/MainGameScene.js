@@ -13,8 +13,8 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('open_tileset', 'assets/Tilemap/open_tileset.png');
-    this.load.tilemapTiledJSON('trialMap', 'assets/Tilemap/city.json');
+    this.load.image("open_tileset", "assets/Tilemap/open_tileset.png");
+    this.load.tilemapTiledJSON("trialMap", "assets/Tilemap/city.json");
     this.load.spritesheet("player", "assets/player.png", {
       frameWidth: 32,
       frameHeight: 32.5,
@@ -27,6 +27,7 @@ export default class MainGameScene extends Phaser.Scene {
 
   create() {
     // Create the tilemap
+
   const map = this.make.tilemap({ key: 'trialMap' });
 
   // Add the tileset image to the tilemap
@@ -51,8 +52,6 @@ export default class MainGameScene extends Phaser.Scene {
   boxLayer.setCollisionByExclusion([-1]);
   treea01Layer.setCollisionByExclusion([-1]);
 
-
-
     // Create the player
     this.player = new Player(this, 800, 700, "player");
 
@@ -76,8 +75,6 @@ export default class MainGameScene extends Phaser.Scene {
 
     // Set camera bounds to match the tilemap size
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-
-    
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
@@ -120,7 +117,7 @@ export default class MainGameScene extends Phaser.Scene {
       const x = Phaser.Math.Between(500, 600);
       const y = Phaser.Math.Between(100, 450);
       const zombie = new Enemy(this, x, y, "enemy");
-      zombie.setScale(1);
+      zombie.setScale(0.5);
 
       this.physics.add.overlap(
         this.player,
@@ -141,18 +138,11 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   createMiniMap() {
-<<<<<<< HEAD
-    this.miniMapCamera = this.cameras.add(500, 300, 300, 300).setZoom(0.5).setBounds(0, 0, 2000, 2000);
-    this.miniMapCamera.startFollow(this.player);
-=======
     this.miniMapCamera = this.cameras
       .add(500, 300, 300, 300)
-      .setZoom(0.2)
+      .setZoom(0.5)
       .setBounds(0, 0, 2000, 2000);
-    this.playerMarker = this.add
-      .rectangle(0, 0, 5, 5, 0xff0000)
-      .setScrollFactor(0);
->>>>>>> 15d71cc (Changed zombies and their movement)
+    this.miniMapCamera.startFollow(this.player);
   }
 
   toggleMiniMap() {
@@ -185,7 +175,6 @@ export default class MainGameScene extends Phaser.Scene {
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
-
 
     if (
       !this.zombies.some((zombie) => this.physics.overlap(this.player, zombie))
