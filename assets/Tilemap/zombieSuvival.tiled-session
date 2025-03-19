@@ -36,11 +36,11 @@
             "scaleInDock": 2.5467
         },
         "city.json": {
-            "scale": 1.0461,
+            "scale": 0.4348,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 544.4030207437147,
-                "y": 319.2811394704139
+                "x": 1266.0993560257589,
+                "y": 457.6816927322907
             }
         },
         "city.json#open_tileset": {
