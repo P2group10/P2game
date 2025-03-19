@@ -5,7 +5,7 @@
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
-            "scaleInDock": 1
+            "scaleInDock": 0.6829
         },
         "#overworld": {
             "scaleInEditor": 1
@@ -36,11 +36,11 @@
             "scaleInDock": 2.5467
         },
         "city.json": {
-            "scale": 0.4348,
-            "selectedLayer": 5,
+            "scale": 0.2532,
+            "selectedLayer": 8,
             "viewCenter": {
-                "x": 1266.0993560257589,
-                "y": 457.6816927322907
+                "x": 73.06477093206968,
+                "y": 414.6919431279622
             }
         },
         "city.json#open_tileset": {
