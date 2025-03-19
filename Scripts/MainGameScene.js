@@ -49,6 +49,7 @@ export default class MainGameScene extends Phaser.Scene {
 
     this.building2Layer = building2Layer;
 
+
     fencesLayer.setCollisionByExclusion([-1]);
     buildingLayer.setCollisionByExclusion([-1]);
     boxLayer.setCollisionByExclusion([-1]);
@@ -109,7 +110,6 @@ export default class MainGameScene extends Phaser.Scene {
       callback: this.spawnZombie,
       callbackScope: this,
       loop: true,
-      loop: true,
     });
 
     // Create mini-map
@@ -123,13 +123,6 @@ export default class MainGameScene extends Phaser.Scene {
       const zombie = new Enemy(this, x, y, "enemy");
       zombie.setScale(0.5);
 
-      this.physics.add.overlap(
-        this.player,
-        zombie,
-        this.handleOverlap,
-        null,
-        this
-      );
       this.physics.add.overlap(
         this.player,
         zombie,
@@ -193,10 +186,16 @@ export default class MainGameScene extends Phaser.Scene {
     if (tile) {
       // Player is walking through the building2Layer, lower opacity
       this.building2Layer.setAlpha(0.2); // Set opacity to 50%
+
     } else {
-      // Player is not walking through the building2Layer, reset opacity
-      this.building2Layer.setAlpha(1); // Set opacity to 100%
+      this.building2Layer.setAlpha(1); 
     }
+    if (doortile) {
+      this.doorsLayer.setAlpha(0.5); 
+    } else {
+      this.doorsLayer.setAlpha(1);
+    }
+    
   }
 
   shutdown() {

@@ -110,6 +110,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     } else if (cursors.s.isDown || cursors.down.isDown) {
       this.setVelocityY(crawlVelocity);
       this.anims.play('sprintDown', true);
+
     }
   } 
   // Diagonal walk
