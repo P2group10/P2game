@@ -11,8 +11,7 @@ window.onload = function () {
     height: 600,
     parent: 'gameContainer',
     scene: [StartScene, InfoScene, MainGameScene, GameOverScene],
-    pixelArt: true, // Set to false to enable anti-aliasing
-    roundPixels: true, // Round pixels to prevent sub-pixel rendering issues
+    pixelArt: true,
     physics: {
       default: 'arcade',
       arcade: {
