@@ -159,11 +159,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     // **Fix: Explicitly stop movement when keys are released**
-    if (!cursors.left.isDown && !cursors.right.isDown) {
+    if (!cursors.left.isDown && !cursors.right.isDown && !cursors.a.isDown && !cursors.d.isDown) {
       this.setVelocityX(0);
     }
 
-    if (!cursors.up.isDown && !cursors.down.isDown) {
+    if (!cursors.up.isDown && !cursors.down.isDown && !cursors.w.isDown && !cursors.s.isDown) {
       this.setVelocityY(0);
     }
   }
