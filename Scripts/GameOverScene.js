@@ -10,7 +10,7 @@ export default class GameOverScene extends Phaser.Scene {
         // Stop the MainGameScene and transition to InfoScene after 3 seconds
         this.time.delayedCall(3000, () => {
             this.scene.stop('MainGameScene'); // Stop the MainGameScene
-            this.scene.start('InfoScene'); // Start the InfoScene
+            this.scene.start('StartScene'); // Start the InfoScene
         }, [], this);
     }
 }

@@ -2,7 +2,7 @@
 import StartScene from "./StartScene.js";
 import MainGameScene from "./MainGameScene.js";
 import GameOverScene from "./GameOverScene.js";
-import InfoScene from "./InfoScene.js";
+import PickCharacter from "./pickcharacter.js";
 
 window.onload = function () {
   const config = {
@@ -10,7 +10,7 @@ window.onload = function () {
     width: 800,
     height: 600,
     parent: "gameContainer",
-    scene: [StartScene, InfoScene, MainGameScene, GameOverScene],
+    scene: [StartScene, PickCharacter, MainGameScene, GameOverScene],
     pixelArt: true,
     physics: {
       default: "arcade",

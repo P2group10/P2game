@@ -36,7 +36,7 @@ export default class StartScene extends Phaser.Scene {
     });
 
     startButton.on("pointerdown", () => {
-      this.scene.start("InfoScene");
+      this.scene.start("PickCharacter");
     });
   }
 
