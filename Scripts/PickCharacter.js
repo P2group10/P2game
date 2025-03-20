@@ -31,13 +31,13 @@ export default class PickCharacter extends Phaser.Scene {
     ];
     
     const characterInfo = [
-      "Character 1: Soldier with damage boost and sprint, but regular hp",
-      "Character 2: A powerful medic with the ability to heal teammates and move faster for healing them, but lower hp.",
-      "Character 3: Strong guy with more hp and damage but slower movement speed. Strong guy also has a taunt to take the zombies' attention",
-      "Character 4: Supplier with the ability to carry more and instant reload",
-      "Character 5: Scout with the ability to see a bigger portion of the map to alarm the team for incoming zombies and faster movement",
-      "Character 6: Hunter, provides more damage to animal zombies and can place traps",
-      "Character 7: Perk guy gives extra perks to teammates but can also use them for himself"
+      "Soldier with damage boost and sprint, <br>but regular hp",
+      "A powerful medic with the ability to heal teammates <br> and move faster for healing them, but lower hp.",
+      "Strong guy with more hp and damage but slower movement speed.<br> Strong guy also has a taunt to take the zombies' attention",
+      "Supplier with the ability to carry more<br> and instant reload",
+      "Scout with the ability to see a bigger portion of the map <br>to alarm the team for incoming zombies and faster movement",
+      "Hunter, provides more damage to animal zombies <br>and can place traps",
+      "Perk guy gives extra perks to teammates<br> but can also use them for himself"
     ];
 
     let infoBox = document.createElement('div');
@@ -59,8 +59,8 @@ export default class PickCharacter extends Phaser.Scene {
             charButton.setScale(0.55);
             infoBox.innerHTML = characterInfo[i - 1];
             infoBox.style.display = "block";
-            infoBox.style.top = `${characterPositions[i - 1].y - 40}px`;
-            infoBox.style.left = `${characterPositions[i - 1].x - 100}px`;
+            infoBox.style.top = `${characterPositions[i - 1].y + 10}px`; 
+            infoBox.style.left = `${characterPositions[i - 1].x}px`; 
         });
 
         charButton.on('pointerout', () => {

@@ -15,9 +15,13 @@ export default class MainGameScene extends Phaser.Scene {
   preload() {
     this.load.image("open_tileset", "assets/Tilemap/open_tileset.png");
     this.load.tilemapTiledJSON("trialMap", "assets/Tilemap/city.json");
-    this.load.spritesheet("player", "assets/player.png", {
+    this.load.spritesheet("player", "assets/TestPlayer.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet("pplayer", "assets/player.png", {
       frameWidth: 32,
-      frameHeight: 32.5,
+      frameHeight: 32,
     });
     this.load.spritesheet("enemy", "assets/zombies.png", {
       frameWidth: 64,
@@ -28,30 +32,28 @@ export default class MainGameScene extends Phaser.Scene {
   create() {
     // Create the tilemap
 
-  const map = this.make.tilemap({ key: 'trialMap' });
+    const map = this.make.tilemap({ key: "trialMap" });
 
-  // Add the tileset image to the tilemap
-  const tileset = map.addTilesetImage('open_tileset', 'open_tileset');
+    // Add the tileset image to the tilemap
+    const tileset = map.addTilesetImage("open_tileset", "open_tileset");
 
-  // Create the layers from the tilemap
-  const groundLayer = map.createLayer('ground', tileset, 0, 0);
-  const treea01Layer = map.createLayer('trees 01', tileset, 0, 0);
-  const treea02Layer = map.createLayer('trees non collide', tileset, 0, 0);
-  const streetsLayer = map.createLayer('streets', tileset, 0, 0);
-  const sidewalksLayer = map.createLayer('sidewalks', tileset, 0, 0);
-  const buildingLayer = map.createLayer('building', tileset, 0, 0);
-  const building2Layer = map.createLayer('building walk through', tileset, 0, 0);
-  const boxLayer = map.createLayer('boxes', tileset, 0, 0);
-  const fencesLayer = map.createLayer('fences', tileset, 0, 0);
-  const doorsLayer = map.createLayer('doors', tileset, 0, 0);
+    // Create the layers from the tilemap
+    const groundLayer = map.createLayer('ground', tileset, 0, 0);
+    const treea01Layer = map.createLayer('trees 01', tileset, 0, 0);
+    const streetsLayer = map.createLayer('streets', tileset, 0, 0);
+    const sidewalksLayer = map.createLayer('sidewalks', tileset, 0, 0);
+    const buildingLayer = map.createLayer('building', tileset, 0, 0);
+    const walkthrough = map.createLayer('walk through', tileset, 0, 0);
+    const boxLayer = map.createLayer('boxes', tileset, 0, 0);
+    const fencesLayer = map.createLayer('fences', tileset, 0, 0);
 
-  this.building2Layer = building2Layer;
-  this.doorsLayer = doorsLayer;
+    
+    this.walkthrough = walkthrough;
 
-  fencesLayer.setCollisionByExclusion([-1]);
-  buildingLayer.setCollisionByExclusion([-1]);
-  boxLayer.setCollisionByExclusion([-1]);
-  treea01Layer.setCollisionByExclusion([-1]);
+    fencesLayer.setCollisionByExclusion([-1]);
+    buildingLayer.setCollisionByExclusion([-1]);
+    boxLayer.setCollisionByExclusion([-1]);
+    treea01Layer.setCollisionByExclusion([-1]);
 
     // Create the player
     this.player = new Player(this, 800, 700, "player");
@@ -88,7 +90,6 @@ export default class MainGameScene extends Phaser.Scene {
       up : Phaser.Input.Keyboard.KeyCodes.UP,
       down : Phaser.Input.Keyboard.KeyCodes.DOWN,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
     });
 
@@ -176,22 +177,17 @@ export default class MainGameScene extends Phaser.Scene {
         this.overlapTimer = null;
       }
     }
-    const playerTile = this.building2Layer.worldToTileXY(this.player.x, this.player.y);
-    const rooftile = this.building2Layer.getTileAt(playerTile.x, playerTile.y);
-    const doortile = this.doorsLayer.getTileAt(playerTile.x, playerTile.y);
+    const playerTile = this.walkthrough.worldToTileXY(this.player.x, this.player.y);
+    const tile = this.walkthrough.getTileAt(playerTile.x, playerTile.y);
     
-    if (rooftile) {
-      this.building2Layer.setAlpha(0.5); 
+    if (tile) {
+      this.walkthrough.setAlpha(0.5); 
     } else {
-      this.building2Layer.setAlpha(1); 
-    }
-    if (doortile) {
-      this.doorsLayer.setAlpha(0.5); 
-    } else {
-      this.doorsLayer.setAlpha(1);
+      this.walkthrough.setAlpha(1); 
     }
     
   }
+
 
   shutdown() {
     if (this.spawnTimer) {
@@ -201,4 +197,3 @@ export default class MainGameScene extends Phaser.Scene {
     this.overlapTimer = null;
   }
 }
-
