@@ -13,14 +13,7 @@ export default class MainGameScene extends Phaser.Scene {
     this.maxZombies = 5;
     this.spawnInterval = 2000;
 
-    socket.on("updatePlayers", (backendPlayers) => {
-      for (const id in backendPlayers) {
-        const backendPlayer = backendPlayers[id];
-        if (!this.players[id]) {
-          console.log("Received backendPlayers:", backendPlayers);
-        }
-      }
-    });
+    
   }
   preload() {
     this.load.image("open_tileset", "assets/Tilemap/open_tileset.png");
@@ -40,6 +33,7 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   create() {
+    
     socket.emit("sceneLoaded", "MaingameScene");
     // Create the tilemap
     const map = this.make.tilemap({ key: "trialMap" });
@@ -66,7 +60,7 @@ export default class MainGameScene extends Phaser.Scene {
 
     // Create the player
     this.player = new Player(this, 800, 700, "player");
-    socket.emit("PlayerPosition", { x: this.player.x, y: this.player.y });
+    socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
     this.physics.add.collider(this.player, fencesLayer);
     this.physics.add.collider(this.player, buildingLayer);
     this.physics.add.collider(this.player, boxLayer);
@@ -173,8 +167,43 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   update() {
+
+
+    socket.on("updatePlayers", (backendPlayers) => {
+      for (const id in backendPlayers) {
+        const backendPlayer = backendPlayers[id];
+    
+        // If the player doesn't exist, create a new player instance
+        if (!this.players[id]) {
+          this.players[id] = new this.Player(this, backendPlayer.x, backendPlayer.y, "player");
+          console.log("New player connected:", id);
+        } else {
+          // If the player already exists, update their position
+          this.players[id].x = backendPlayer.x;
+          this.players[id].y = backendPlayer.y;
+        }
+      }
+      // Remove players that have disconnected
+  for (const id in this.players) {
+    if (!backendPlayers[id]) {
+      this.players[id].destroy(); // Remove the player sprite
+      delete this.players[id];
+      console.log("Player disconnected:", id);
+    }
+  }
+});
+
     this.player.update(this.cursors);
     socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
+
+    // Update remote players
+    for (const id in this.players) {
+    if (id !== socket.id) {
+      // Remote players don't need to handle input, just update their positions
+      this.players[id].update(); // Ensure the Player class has an update method for remote players
+    }
+  }
+
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });
