@@ -28,10 +28,10 @@ io.on("connection", (socket) => {
     name: `Player ${i}`, // Default name
     x: 100,
     y: 100,
+    animation: "idle", // Default animation
+    spriteModel: "player", // Default sprite model
   };
-
   previousPositions[socket.id] = { x: 100, y: 100 }; // Initialize previous position
-
   io.emit("updatePlayers", players); // Broadcast the updated players object
 
   // Listen for player name updates
@@ -51,24 +51,30 @@ io.on("connection", (socket) => {
       previousPosition.x !== position.x ||
       previousPosition.y !== position.y
     ) {
-      // Update the player's position in the players object
       players[socket.id].x = position.x;
       players[socket.id].y = position.y;
-  
-      // Broadcast the updated players object to all clients
       io.emit("updatePlayers", players);
-  
-      // Emit the player's position to all clients for logging
       io.emit("playerPositionUpdate", {
         playerId: socket.id,
         playerName: players[socket.id].name,
         x: position.x,
         y: position.y,
+        animation: players[socket.id].animation, // Include the current animation state
+        spriteModel: players[socket.id].spriteModel, // Include the current sprite model
       });
     }
-  
     // Update the previous position
     previousPositions[socket.id] = { x: position.x, y: position.y };
+  });
+
+  socket.on("setPlayerAnimation", (animation) => {
+    players[socket.id].animation = animation;
+    io.emit("updatePlayers", players);
+  });
+
+  socket.on("setPlayerSpriteModel", (spriteModel) => {
+    players[socket.id].spriteModel = spriteModel;
+    io.emit("updatePlayers", players);
   });
 
   // Handle player disconnection

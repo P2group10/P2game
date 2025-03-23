@@ -1,7 +1,7 @@
 // MainGameScene.js
+const socket = io();
 import Player from "./characters.js";
 import Enemy from "./enemies.js";
-const socket = io();
 
 export default class MainGameScene extends Phaser.Scene {
   constructor() {
@@ -18,7 +18,10 @@ export default class MainGameScene extends Phaser.Scene {
           Player: data.playerName, // Ensure this matches the key sent from the server
           ID: data.playerId,       // Ensure this matches the key sent from the server
           X: data.x,               // Ensure this matches the key sent from the server
-          Y: data.y                // Ensure this matches the key sent from the server
+          Y: data.y,              // Ensure this matches the key sent from the server
+          animation: data.animation,
+          spritemodel: data.spriteModel,
+          
         }
       ];
       console.table(tableData);
@@ -67,7 +70,7 @@ export default class MainGameScene extends Phaser.Scene {
     treea01Layer.setCollisionByExclusion([-1]);
 
     // Create the player
-    this.player = new Player(this, 800, 700, "player");
+    this.player = new Player(this, 800, 700, "player", socket);
     socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
     this.physics.add.collider(this.player, fencesLayer);
     this.physics.add.collider(this.player, buildingLayer);
