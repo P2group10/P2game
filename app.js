@@ -51,12 +51,24 @@ io.on("connection", (socket) => {
       previousPosition.x !== position.x ||
       previousPosition.y !== position.y
     ) {
-      console.log(`Player ${socket.id} position:`, position);
+      // Update the player's position in the players object
+      players[socket.id].x = position.x;
+      players[socket.id].y = position.y;
+  
+      // Broadcast the updated players object to all clients
       io.emit("updatePlayers", players);
+  
+      // Emit the player's position to all clients for logging
+      io.emit("playerPositionUpdate", {
+        playerId: socket.id,
+        playerName: players[socket.id].name,
+        x: position.x,
+        y: position.y,
+      });
     }
-    players[socket.id].x = position.x;
-    players[socket.id].y = position.y;
-    previousPositions[socket.id] = { x: position.x, y: position.y }; // Update previous position
+  
+    // Update the previous position
+    previousPositions[socket.id] = { x: position.x, y: position.y };
   });
 
   // Handle player disconnection
