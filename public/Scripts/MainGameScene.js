@@ -55,9 +55,10 @@ export default class MainGameScene extends Phaser.Scene {
             this,
             players[id].x,
             players[id].y,
-            "player",
+            players[id].spriteModel, // Use the sprite model from the server
             socket
           );
+          remotePlayer.isLocalPlayer = false; // Mark this player as a remote player
           remotePlayer.setData("id", id); // Store the player ID
           this.players[id] = remotePlayer; // Add to the players object
           this.remotePlayers.add(remotePlayer); // Add to the remotePlayers group
@@ -65,10 +66,12 @@ export default class MainGameScene extends Phaser.Scene {
       }
     });
 
+    // Listen for position updates
     socket.on("playerPositionUpdate", (data) => {
-      const remotePlayer = this.players[data.playerId]; // Find the remote player by ID
+      const remotePlayer = this.players[data.playerId];
       if (remotePlayer) {
-        remotePlayer.setPosition(data.x, data.y); // Update the player's position
+        remotePlayer.setPosition(data.x, data.y); // Update position
+        remotePlayer.anims.play(data.animation, true); // Update animation
       }
     });
     console.log(this.remotePlayers);
@@ -98,6 +101,7 @@ export default class MainGameScene extends Phaser.Scene {
 
     // Create the player
     this.player = new Player(this, 800, 700, "player", socket);
+    this.player.isLocalPlayer = true;
     socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
     this.physics.add.collider(this.player, fencesLayer);
     this.physics.add.collider(this.player, buildingLayer);
@@ -206,16 +210,16 @@ export default class MainGameScene extends Phaser.Scene {
 
   update() {
     // Update local player
-  this.player.update(this.cursors);
-  socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
+    this.player.update(this.cursors);
+    socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
 
-  // Update remote players
-  for (const id in this.players) {
-    if (id !== socket.id) {
-      this.players[id].update(); // Ensure the Player class has an update method for remote players
+    // Update remote players
+    for (const id in this.players) {
+      if (id !== socket.id) {
+        const remotePlayer = this.players[id];
+        remotePlayer.update(); // Ensure the Player class has an update method for remote players
+      }
     }
-  }
-
 
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
