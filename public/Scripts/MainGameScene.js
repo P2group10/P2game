@@ -6,7 +6,7 @@ import Enemy from "./enemies.js";
 export default class MainGameScene extends Phaser.Scene {
   constructor() {
     super({ key: "MainGameScene" });
-    this.players = {};
+    this.remotePlayers = null; // This will store the group for remote players
     this.overlapTimer = null;
     this.isMiniMapVisible = true;
     this.zombies = [];
@@ -16,13 +16,12 @@ export default class MainGameScene extends Phaser.Scene {
       const tableData = [
         {
           Player: data.playerName, // Ensure this matches the key sent from the server
-          ID: data.playerId,       // Ensure this matches the key sent from the server
-          X: data.x,               // Ensure this matches the key sent from the server
-          Y: data.y,              // Ensure this matches the key sent from the server
+          ID: data.playerId, // Ensure this matches the key sent from the server
+          X: data.x, // Ensure this matches the key sent from the server
+          Y: data.y, // Ensure this matches the key sent from the server
           animation: data.animation,
           spritemodel: data.spriteModel,
-          
-        }
+        },
       ];
       console.table(tableData);
     });
@@ -45,6 +44,34 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   create() {
+    this.remotePlayers = this.add.group();
+    this.players = {}; // Store remote player instances by their socket ID
+
+    socket.on("updatePlayers", (players) => {
+      for (const id in players) {
+        if (id !== socket.id && !this.players[id]) {
+          // Create a new remote player instance
+          const remotePlayer = new Player(
+            this,
+            players[id].x,
+            players[id].y,
+            "player",
+            socket
+          );
+          remotePlayer.setData("id", id); // Store the player ID
+          this.players[id] = remotePlayer; // Add to the players object
+          this.remotePlayers.add(remotePlayer); // Add to the remotePlayers group
+        }
+      }
+    });
+
+    socket.on("playerPositionUpdate", (data) => {
+      const remotePlayer = this.players[data.playerId]; // Find the remote player by ID
+      if (remotePlayer) {
+        remotePlayer.setPosition(data.x, data.y); // Update the player's position
+      }
+    });
+    console.log(this.remotePlayers);
     socket.emit("sceneLoaded", "MaingameScene");
     // Create the tilemap
     const map = this.make.tilemap({ key: "trialMap" });
@@ -178,17 +205,17 @@ export default class MainGameScene extends Phaser.Scene {
   }
 
   update() {
+    // Update local player
+  this.player.update(this.cursors);
+  socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
 
-    this.player.update(this.cursors);
-    socket.emit("playerPosition", { x: this.player.x, y: this.player.y });
-
-    // Update remote players
-    for (const id in this.players) {
-      if (id !== socket.id) {
-        // Remote players don't need to handle input, just update their positions
-        this.players[id].update(); // Ensure the Player class has an update method for remote players
-      }
+  // Update remote players
+  for (const id in this.players) {
+    if (id !== socket.id) {
+      this.players[id].update(); // Ensure the Player class has an update method for remote players
     }
+  }
+
 
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
