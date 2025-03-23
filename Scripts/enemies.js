@@ -1,3 +1,5 @@
+import HealthBar from "./healthBar.js";
+
 // enemies.js
 export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y, texture) {
@@ -15,6 +17,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.createAnimations(scene);
     this.body.setCircle(16, 16, 16);
 
+    this.hp = new HealthBar(scene, this);
   }
 
   getRandomPointInRadius() {
@@ -28,27 +31,42 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   createAnimations(scene) {
     scene.anims.create({
       key: "zIdle",
-      frames: scene.anims.generateFrameNumbers("enemy", {start: 143, end: 151,}),
+      frames: scene.anims.generateFrameNumbers("enemy", {
+        start: 143,
+        end: 151,
+      }),
       frameRate: 10,
     });
     scene.anims.create({
       key: "zRunRight",
-      frames: scene.anims.generateFrameNumbers("enemy", {start: 144, end: 151,}),
+      frames: scene.anims.generateFrameNumbers("enemy", {
+        start: 144,
+        end: 151,
+      }),
       frameRate: 20,
     });
     scene.anims.create({
       key: "zRunUp",
-      frames: scene.anims.generateFrameNumbers("enemy", { start: 105, end: 112, }),
-      frameRate: 20
+      frames: scene.anims.generateFrameNumbers("enemy", {
+        start: 105,
+        end: 112,
+      }),
+      frameRate: 20,
     });
     scene.anims.create({
       key: "zRunDown",
-      frames: scene.anims.generateFrameNumbers("enemy", { start: 131, end: 138, }),
+      frames: scene.anims.generateFrameNumbers("enemy", {
+        start: 131,
+        end: 138,
+      }),
       frameRate: 20,
     });
     scene.anims.create({
       key: "zRunLeft",
-      frames: scene.anims.generateFrameNumbers("enemy", {start: 118, end: 125,}),
+      frames: scene.anims.generateFrameNumbers("enemy", {
+        start: 118,
+        end: 125,
+      }),
       frameRate: 20,
     });
   }
@@ -110,5 +128,6 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
       }
     }
+    this.hp.update();
   }
 }
