@@ -4,6 +4,7 @@ import character2 from "/scripts/PlayerCharacters/Character2.js";
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
+    this.otherPlayers = {}; // Store other players by their ID
   }
 
   init(data) {
@@ -51,6 +52,10 @@ export default class GameScene extends Phaser.Scene {
 
     // Create local player based on selected character
     this.createLocalPlayer();
+
+    // Set up socket listeners for other players
+    this.setupSocketListeners();
+
     this.socket.emit("playerPosition", {
       roomCode: this.roomCode,
       playerId: this.socket.id,
@@ -85,8 +90,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createLocalPlayer() {
-    const startX = 400;
-    const startY = 250;
+    let startX = 400;
+    let startY = 250;
     let texture;
     switch (this.character) {
       case "character1":
@@ -94,6 +99,8 @@ export default class GameScene extends Phaser.Scene {
         break;
       case "character2":
         texture = "TestPlayer";
+        startX = 400;
+        startY = 240;
         break;
       default:
         texture = "TestPlayer";
@@ -106,11 +113,95 @@ export default class GameScene extends Phaser.Scene {
       this.player = new character2(this, startX, startY, texture, this.socket);
     }
     this.player.isLocalPlayer = true;
-    this.player.name = this.playerName
+    this.player.name = this.playerName;
     const camera = this.cameras.main;
     camera.startFollow(this.player);
     camera.setZoom(3);
   }
+
+
+  setupSocketListeners() {
+    // Listen for other players' position updates
+    this.socket.on("playerPositionUpdate", (data) => {
+      // Skip if this is our own player
+      if (data.playerId === this.socket.id) return;
+      
+      // Create player if it doesn't exist yet
+      if (!this.otherPlayers[data.playerId]) {
+        this.createRemotePlayer(data);
+      }
+      
+      // Update existing player
+      const otherPlayer = this.otherPlayers[data.playerId];
+      if (otherPlayer) {
+        // Move player to new position
+        otherPlayer.x = data.x;
+        otherPlayer.y = data.y;
+        
+        // Play the correct animation
+        if (data.animation && otherPlayer.anims.currentAnim?.key !== data.animation) {
+          otherPlayer.play(data.animation);
+        }
+      }
+    });
+    // Handle player disconnection
+    this.socket.on("player-left", (playerId) => {
+      // Remove the player sprite if they exist
+      if (this.otherPlayers[playerId]) {
+        this.otherPlayers[playerId].destroy();
+        delete this.otherPlayers[playerId];
+      }
+    });
+  }
+
+  createRemotePlayer(data) {
+    let texture;
+    switch (data.spriteModel) {
+      case "character1":
+        texture = "PlayerM";
+        break;
+      case "character2":
+        texture = "TestPlayer";
+        break;
+      default:
+        texture = "TestPlayer";
+        break;
+    }
+    
+    // Create the appropriate character based on their selected model
+    let remotePlayer;
+    if (data.spriteModel === "character1") {
+      remotePlayer = new character1(this, data.x, data.y, texture);
+    } else {
+      remotePlayer = new character2(this, data.x, data.y, texture);
+    }
+    
+    remotePlayer.isLocalPlayer = false;
+    remotePlayer.name = data.playerName;
+    
+    // Create a name label above the player
+    const nameText = this.add.text(data.x, data.y - 25, data.playerName, { 
+      fontSize: '10px', 
+      fill: '#ffffff',
+      backgroundColor: '#00000080', 
+      padding: { x: 3, y: 1 }
+    });
+    nameText.setOrigin(0.5, 0.5);
+    
+    // Store the text reference with the player
+    remotePlayer.nameText = nameText;
+    
+    // Store the remote player
+    this.otherPlayers[data.playerId] = remotePlayer;
+    
+    // Play initial animation if available
+    if (data.animation) {
+      remotePlayer.play(data.animation);
+    }
+    
+    return remotePlayer;
+  }
+
 
   update() {
     if (this.player) {
