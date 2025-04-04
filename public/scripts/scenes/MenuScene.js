@@ -9,6 +9,18 @@ export default class MenuScene extends Phaser.Scene {
     this.showJoinRoomInput = this.showJoinRoomInput.bind(this);
     this.showCreateRoomInput = this.showCreateRoomInput.bind(this);
     this.handleRoomResponse = this.handleRoomResponse.bind(this);
+
+
+    // Initialize socket only if it doesn't exist
+    if (!this.socket) {
+      this.socket = io("https://a749-130-225-198-150.ngrok-free.app", { 
+        reconnection: true,
+        withCredentials: true,
+        transports: ['websocket', 'polling'] // Explicitly specify transports
+      });
+      this.socket.emit("client-identified", "menu-scene");
+      this.setupSocketListeners();
+    }
   }
 
   preload() {
@@ -41,12 +53,7 @@ export default class MenuScene extends Phaser.Scene {
       backgroundColor: "#222",
     };
 
-    // Initialize socket only if it doesn't exist
-    if (!this.socket) {
-      this.socket = io("http://localhost:5001");
-      this.socket.emit("client-identified", "menu-scene");
-      this.setupSocketListeners();
-    }
+    
 
     this.textInput = new TextInput();
 

@@ -5,8 +5,11 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "*", // Must match your client's URL
+    origin:
+      "http://localhost:5001, https://a749-130-225-198-150.ngrok-free.app",
     methods: ["GET", "POST"],
+    allowedHeaders: ["*"],
+    credentials: true,
   },
 });
 
@@ -185,8 +188,9 @@ io.on("connection", (socket) => {
       animation: data.animation,
       spriteModel: data.spriteModel,
     });
-    console.log(`[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`);
-
+    console.log(
+      `[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`
+    );
   });
 
   // Handle disconnection
