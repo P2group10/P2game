@@ -6,7 +6,7 @@ const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
     origin:
-      "http://localhost:5001, https://a749-130-225-198-150.ngrok-free.app",
+      "http://localhost:5001",
     methods: ["GET", "POST"],
     allowedHeaders: ["*"],
     credentials: true,

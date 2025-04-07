@@ -24,30 +24,43 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
       createAnimations(scene) {
         // Define animations
         scene.anims.create({
-          key: "up",
+          key: "walkUp",
           frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 105,
             end: 112,
           }),
           frameRate: 20,
+          repea: -1,
         });
     
         scene.anims.create({
-          key: "down",
+          key: "walkDown",
           frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 131,
             end: 138,
           }),
           frameRate: 20,
+          repea: -1,
         });
     
         scene.anims.create({
-          key: "right",
+          key: "walkRight",
           frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 144,
             end: 151,
           }),
           frameRate: 20,
+          repea: -1,
+        });
+
+        scene.anims.create({
+          key: "walkLeft",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
+            start: 144,
+            end: 151,
+          }),
+          frameRate: 20,
+          repea: -1,
         });
     
         scene.anims.create({
@@ -56,7 +69,8 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
             start: 27,
             end: 29,
           }),
-          frameRate: 5,
+          frameRate: 20,
+          repea: -1,
         });
     
         scene.anims.create({
@@ -65,12 +79,22 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
             start: 50,
             end: 51,
           }),
-          frameRate: 5,
+          frameRate: 20,
+          repeat: -1,
+        });
+
+        scene.anims.create({
+          key: "sprintRight",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
+            start: 507,
+            end: 514,
+          }),
+          frameRate: 20,
           repeat: -1,
         });
     
         scene.anims.create({
-          key: "sprint",
+          key: "sprintLeft",
           frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 533,
             end: 540,
@@ -102,7 +126,7 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
     
       update(cursors) {
         let velocity = 160;
-        let crawlVelocity = 300;
+        let sprintVelocit = 300;
     
         const previousAnimation = this.animation;
         if (this.isLocalPlayer) {
@@ -112,50 +136,44 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
               (cursors.a.isDown && cursors.w.isDown) ||
               (cursors.left.isDown && cursors.up.isDown)
             ) {
-              this.setVelocity(-crawlVelocity, -crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(-sprintVelocit, -sprintVelocit);
+              this.anims.play("sprintLeft", true);
+              this.animation = "sprintLeft";
             } else if (
               (cursors.a.isDown && cursors.s.isDown) ||
               (cursors.left.isDown && cursors.down.isDown)
             ) {
-              this.setVelocity(-crawlVelocity, crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(-sprintVelocit, sprintVelocit);
+              this.anims.play("sprintLeft", true);
+              this.animation = "sprintLeft";
             } else if (
               (cursors.d.isDown && cursors.w.isDown) ||
               (cursors.right.isDown && cursors.up.isDown)
             ) {
-              this.setVelocity(crawlVelocity, -crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(sprintVelocit, -sprintVelocit);
+              this.anims.play("sprintRight", true);
+              this.animation = "sprintRight";
             } else if (
               (cursors.d.isDown && cursors.s.isDown) ||
               (cursors.right.isDown && cursors.down.isDown)
             ) {
-              this.setVelocity(crawlVelocity, crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(sprintVelocit, sprintVelocit);
+              this.anims.play("sprintRight", true);
+              this.animation = "sprintRight";
             } else if (cursors.a.isDown || cursors.left.isDown) {
-              this.setVelocityX(-crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocityX(-sprintVelocit);
+              this.anims.play("sprintLeft", true);
+              this.animation = "sprintLeft";
             } else if (cursors.d.isDown || cursors.right.isDown) {
-              this.setVelocityX(crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocityX(sprintVelocit);
+              this.anims.play("sprintLeft", true);
+              this.animation = "sprintLeft";
             } else if (cursors.w.isDown || cursors.up.isDown) {
-              this.setVelocityY(-crawlVelocity);
+              this.setVelocityY(-sprintVelocit);
               this.anims.play("sprintUp", true);
               this.animation = "sprintUp";
             } else if (cursors.s.isDown || cursors.down.isDown) {
-              this.setVelocityY(crawlVelocity);
+              this.setVelocityY(sprintVelocit);
               this.anims.play("sprintDown", true);
               this.animation = "sprintDown";
             }
@@ -197,14 +215,13 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
           // Straight walk
           else if (cursors.a.isDown || cursors.left.isDown) {
             this.setVelocityX(-velocity);
-            this.flipX = true;
-            this.anims.play("right", true);
-            this.animation = "right";
+            this.anims.play("walkLeft", true);
+            this.animation = "walkLeft";
           } else if (cursors.d.isDown || cursors.right.isDown) {
             this.setVelocityX(velocity);
             this.flipX = false;
-            this.anims.play("right", true);
-            this.animation = "right";
+            this.anims.play("walkRight", true);
+            this.animation = "walkRight";
           } else if (cursors.w.isDown || cursors.up.isDown) {
             this.setVelocityY(-velocity);
             this.anims.play("up", true);

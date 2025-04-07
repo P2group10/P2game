@@ -13,7 +13,7 @@ export default class MenuScene extends Phaser.Scene {
 
     // Initialize socket only if it doesn't exist
     if (!this.socket) {
-      this.socket = io("https://a749-130-225-198-150.ngrok-free.app", { 
+      this.socket = io({ 
         reconnection: true,
         withCredentials: true,
         transports: ['websocket', 'polling'] // Explicitly specify transports
