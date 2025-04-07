@@ -1,6 +1,7 @@
 // MainGameScene.js
 import Player from "./characters.js";
 import Enemy from "./enemies.js";
+import HealthBar from "./healthBar.js";
 
 export default class MainGameScene extends Phaser.Scene {
   constructor() {
@@ -165,6 +166,7 @@ export default class MainGameScene extends Phaser.Scene {
 
   update() {
     this.player.update(this.cursors);
+    this.player.hp.update();
     this.zombies.forEach((zombie) => {
       zombie.update(this.player);
     });

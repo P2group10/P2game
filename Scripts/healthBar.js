@@ -1,16 +1,32 @@
 export default class HealthBar {
-  constructor(scene, Player) {
-    this.healthBar = new Phaser.GameObjects.Graphics(scene);
-
-    this.player = Player;
-    this.value = 100;
-    this.percent = 28 / 100; //Get percent of box to fill in draw function
-
+  constructor(scene, player) {
+    this.player = player;
     this.scene = scene;
 
-    scene.add.existing(this.healthBar);
+    this.maxhealth = 100;
+    this.value = this.maxhealth;
+    this.percent = 28 / 100; //Get percent of box to fill in draw function
 
-    this.draw();
+    this.barWidth = 28;
+    this.barHeight = 4;
+
+    //Create the healthbar - later put in a container
+    this.bg = scene.add.rectangle(0, 0, 30, 6, 0x000000);
+    this.border = scene.add.rectangle(0, 0, 24, 4, 0xffffff);
+    this.fill = scene.add.rectangle(0, 0, 24, 4, 0x00ff00);
+
+    //Set the position of the healthbar to 0,0 (Relative to the container)
+    this.bg.setPosition(0, 0);
+    this.border.setPosition(-2, 0);
+    this.fill.setPosition(-2, 0);
+
+    this.container = scene.add.container(player.x, player.y - 20, [
+      this.bg,
+      this.border,
+      this.fill,
+    ]);
+
+    //this.draw();
   }
 
   draw() {
@@ -39,6 +55,19 @@ export default class HealthBar {
   }
 
   update() {
-    this.draw();
+    //this.draw();
+    this.container.setPosition(
+      Math.round(this.player.x),
+      Math.round(this.player.y - 20)
+    );
+
+    const hpRatio = this.value / this.maxhealth;
+    this.fill.width = this.barWidth * hpRatio;
+
+    if (this.value < 30) {
+      this.fill.fillColor = 0xff0000;
+    } else {
+      this.fill.fillColor = 0x00ff00;
+    }
   }
 }

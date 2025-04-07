@@ -230,6 +230,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(0);
     }
 
-    this.hp.update();
+    //this.hp.update();
   }
 }
