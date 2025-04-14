@@ -5,8 +5,11 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5001", // Must match your client's URL
+    origin:
+      "http://localhost:5001",
     methods: ["GET", "POST"],
+    allowedHeaders: ["*"],
+    credentials: true,
   },
 });
 
@@ -163,7 +166,8 @@ io.on("connection", (socket) => {
 
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
-    
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`);
     // Use data from the emitted event instead of undefined player object
     console.table({
       playerId: socket.id,
@@ -172,11 +176,20 @@ io.on("connection", (socket) => {
       y: data.y,
       animation: data.animation,
       spriteModel: data.spriteModel,
+      playerHp: data.playerHP,
+    });
+
+    // Only emit to others in the same room
+    socket.to(roomCode).emit("playerPositionUpdate", {
+      playerId: data.playerId,
+      playerName: data.playerName,
+      x: data.x,
+      y: data.y,
+      animation: data.animation,
+      spriteModel: data.spriteModel,
+      playerHp: data.playerHP,
     });
     
-    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
-  
-    socket.to(roomCode).emit("playerPositionUpdate", data);
   });
 
   // Handle disconnection

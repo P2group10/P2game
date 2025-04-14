@@ -72,11 +72,13 @@ export default class CharacterSelectScene extends Phaser.Scene {
     this.character1.on("pointerdown", () => {
       console.log(`Character 1. selected`);
       this.selectCharacter("character1");
+      this.updatePlayerList();
     });
     
     this.character2.on("pointerdown", () => {
       console.log(`Character 2. selected`);
       this.selectCharacter("character2");
+      this.updatePlayerList();
     });
 
 
@@ -94,7 +96,10 @@ export default class CharacterSelectScene extends Phaser.Scene {
 
     this.readyButton.on("pointerover", () => this.readyButton.setScale(1.1));
     this.readyButton.on("pointerout", () => this.readyButton.setScale(1));
-    this.readyButton.on("pointerdown", () => this.toggleReady());
+    this.readyButton.on("pointerdown", () => {
+      this.updatePlayerList();
+      this.toggleReady()
+    });
 
     // Player List Container
     this.playerListContainer = this.add
@@ -112,16 +117,30 @@ export default class CharacterSelectScene extends Phaser.Scene {
         fill: "#ffffff",
       })
       .setOrigin(0, 0);
+      this.updatePlayerList();
   }
 
   selectCharacter(characterId) {
     if (this.readyButton.getData("ready")) return;
-
+  
     this.selectedCharacter = characterId;
+    
+    // Update the local player's character in the players array
+    const currentPlayer = this.players.find(p => p.id === this.playerId);
+    if (currentPlayer) {
+      currentPlayer.character = characterId;
+    }
+    
+    // Emit to server
     this.socket.emit("select-character", {
       roomCode: this.roomCode,
       characterId: characterId,
     });
+    
+    // Highlight the selected character
+    this.character1.setTint(characterId === "character1" ? 0x00ff00 : 0xffffff);
+    this.character2.setTint(characterId === "character2" ? 0x00ff00 : 0xffffff);
+    this.updatePlayerList();
   }
 
   toggleReady() {
@@ -134,6 +153,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
       roomCode: this.roomCode,
       isReady: isReady,
     });
+    this.updatePlayerList();
   }
 
   setupSocketListeners() {
