@@ -166,7 +166,8 @@ io.on("connection", (socket) => {
 
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
-
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`);
     // Use data from the emitted event instead of undefined player object
     console.table({
       playerId: socket.id,
@@ -175,9 +176,8 @@ io.on("connection", (socket) => {
       y: data.y,
       animation: data.animation,
       spriteModel: data.spriteModel,
+      playerHp: data.playerHP,
     });
-
-    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
 
     // Only emit to others in the same room
     socket.to(roomCode).emit("playerPositionUpdate", {
@@ -187,10 +187,9 @@ io.on("connection", (socket) => {
       y: data.y,
       animation: data.animation,
       spriteModel: data.spriteModel,
+      playerHp: data.playerHP,
     });
-    console.log(
-      `[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`
-    );
+    
   });
 
   // Handle disconnection

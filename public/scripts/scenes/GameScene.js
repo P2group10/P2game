@@ -64,6 +64,7 @@ export default class GameScene extends Phaser.Scene {
       y: this.player.y,
       animation: this.player.anims.currentAnim?.key || "idle",
       spriteModel: this.character,
+      playerHP: this.player.playerHP,
     });
     // Set initial position
     this.previousX = this.player.x;
@@ -92,7 +93,12 @@ export default class GameScene extends Phaser.Scene {
   createLocalPlayer() {
     let startX = 400;
     let startY = 250;
+    let playerHP = 100;
     let texture;
+
+    console.log("Creating local player with character:", this.character);
+
+
     switch (this.character) {
       case "character1":
         texture = "PlayerM";
@@ -101,6 +107,7 @@ export default class GameScene extends Phaser.Scene {
         texture = "TestPlayer";
         startX = 400;
         startY = 240;
+        playerHP = 200;
         break;
       default:
         texture = "TestPlayer";
@@ -108,12 +115,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (this.character === "character1") {
-      this.player = new character1(this, startX, startY, texture, this.socket);
+      this.player = new character1(this, startX, startY, texture, playerHP, this.socket);
     } else {
-      this.player = new character2(this, startX, startY, texture, this.socket);
+      this.player = new character2(this, startX, startY, texture, playerHP, this.socket);
     }
+    this.player.playerHP = playerHP;
     this.player.isLocalPlayer = true;
     this.player.name = this.playerName;
+
     const camera = this.cameras.main;
     camera.startFollow(this.player);
     camera.setZoom(3);
@@ -137,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
         // Move player to new position
         otherPlayer.x = data.x;
         otherPlayer.y = data.y;
-        
+        otherPlayer.playerHp = data.playerHp;
         // Play the correct animation
         if (data.animation && otherPlayer.anims.currentAnim?.key !== data.animation) {
           otherPlayer.play(data.animation);
@@ -156,6 +165,10 @@ export default class GameScene extends Phaser.Scene {
 
   createRemotePlayer(data) {
     let texture;
+
+    console.log("Creating remote player with character:", this.otherPlayers.character);
+
+
     switch (data.spriteModel) {
       case "character1":
         texture = "PlayerM";
@@ -230,6 +243,7 @@ export default class GameScene extends Phaser.Scene {
           y: this.player.y,
           animation: this.player.anims.currentAnim?.key || "idle",
           spriteModel: this.character,
+          playerHP: this.player.playerHP,
         });
 
         // Update the previous position
