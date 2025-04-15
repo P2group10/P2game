@@ -19,13 +19,10 @@ export default class TextInput {
       backgroundColor: "#222",
       color: "#fff",
       border: "2px solid #4CAF50",
-      borderRadius: "10px",
-      padding: "10px 15px",
+      padding: "5px 15px",
       fontSize: "20px",
       textAlign: "center",
-      width: "250px",
       outline: "none",
-      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
       transition: "border-color 0.3s ease",
     };
 
@@ -37,12 +34,11 @@ export default class TextInput {
     });
 
     inputElement.addEventListener("blur", function () {
-      this.style.borderColor = "#4CAF50";
-      this.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
+      this.style.borderColor = "#ffcc00";
     });
 
-    const gameCanvas = document.getElementById("gameCanvas");
-    gameCanvas.appendChild(inputElement);
+    const gameScreen = document.getElementById("gameScreen");
+    gameScreen.appendChild(inputElement);
     inputElement.focus();
 
     return inputElement;
@@ -64,13 +60,10 @@ export default class TextInput {
       backgroundColor: "#222",
       color: "#fff",
       border: "2px solid #4CAF50",
-      borderRadius: "10px",
-      padding: "10px 15px",
+      padding: "5px 15px",
       fontSize: "20px",
       textAlign: "center",
-      width: "250px",
       outline: "none",
-      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
       transition: "border-color 0.3s ease",
     };
 
@@ -78,16 +71,10 @@ export default class TextInput {
 
     inputElement.addEventListener("focus", function () {
       this.style.borderColor = "#ffcc00";
-      this.style.boxShadow = "0 2px 15px rgba(255, 204, 0, 0.3)";
     });
 
-    inputElement.addEventListener("blur", function () {
-      this.style.borderColor = "#4CAF50";
-      this.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.3)";
-    });
-
-    const gameCanvas = document.getElementById("gameCanvas");
-    gameCanvas.appendChild(inputElement);
+    const gameScreen = document.getElementById("gameScreen");
+    gameScreen.appendChild(inputElement);
     inputElement.focus();
 
     return inputElement;

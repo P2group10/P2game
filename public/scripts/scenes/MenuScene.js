@@ -49,7 +49,6 @@ export default class MenuScene extends Phaser.Scene {
       font: "32px Arial",
       fill: "#ffffff",
       padding: { x: 20, y: 10 },
-      borderRadius: 5,
       backgroundColor: "#222",
     };
 
@@ -130,6 +129,9 @@ export default class MenuScene extends Phaser.Scene {
 
   handleRoomResponse(response, isHost) {
     if (response.success) {
+      const inputs = document.querySelectorAll('input[type="text"]');
+      inputs.forEach((input) => input.remove());
+      
       this.scene.start("CharacterSelectScene", {
         roomCode: response.roomCode,
         socket: this.socket,
