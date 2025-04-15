@@ -7,7 +7,7 @@ const config = {
   backgroundColor: "#FFFF",
 
   scale: {
-    parent: "gameContainer",
+    parent: "gameScreen",
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: 1200,
