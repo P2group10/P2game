@@ -1,5 +1,5 @@
 export default class character2 extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, socket) {
+    constructor(scene, x, y, texture, playerHP, socket) {
         super(scene, x, y, texture);
         // Store the scene and socket for later use
         this.scene = scene;
@@ -24,53 +24,68 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
       createAnimations(scene) {
         // Define animations
         scene.anims.create({
-          key: "up",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "walkUpPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 105,
             end: 112,
           }),
           frameRate: 20,
+          repeat: -1,
         });
     
         scene.anims.create({
-          key: "down",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "walkDownPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 131,
             end: 138,
           }),
           frameRate: 20,
+          repeat: -1,
         });
     
         scene.anims.create({
-          key: "right",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "walkRightPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 144,
             end: 151,
           }),
           frameRate: 20,
+          repeat: -1,
+        });
+
+        scene.anims.create({
+          key: "walkLeftPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
+            start: 118,
+            end: 125,
+          }),
+          frameRate: 20,
+          repeat: -1,
         });
     
         scene.anims.create({
-          key: "idle",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "idlePlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 27,
             end: 29,
           }),
           frameRate: 5,
+          repeat: -1,
         });
-    
+
         scene.anims.create({
-          key: "cute",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
-            start: 50,
-            end: 51,
+          key: "sprintLeftPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
+            start: 507,
+            end: 514,
           }),
-          frameRate: 5,
+          frameRate: 20,
+          repeat: -1,
         });
     
         scene.anims.create({
-          key: "sprint",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "sprintRightPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 533,
             end: 540,
           }),
@@ -79,8 +94,8 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         });
     
         scene.anims.create({
-          key: "sprintUp",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "sprintUpPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 494,
             end: 500,
           }),
@@ -89,8 +104,8 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         });
     
         scene.anims.create({
-          key: "sprintDown",
-          frames: scene.anims.generateFrameNumbers("TestPlayer", {
+          key: "sprintDownPlayerM",
+          frames: scene.anims.generateFrameNumbers("PlayerM", {
             start: 520,
             end: 527,
           }),
@@ -101,7 +116,7 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
     
       update(cursors) {
         let velocity = 160;
-        let crawlVelocity = 300;
+        let sprintVelocit = 300;
     
         const previousAnimation = this.animation;
         if (this.isLocalPlayer) {
@@ -111,52 +126,46 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
               (cursors.a.isDown && cursors.w.isDown) ||
               (cursors.left.isDown && cursors.up.isDown)
             ) {
-              this.setVelocity(-crawlVelocity, -crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(-sprintVelocit, -sprintVelocit);
+              this.anims.play("sprintUpPlayerM", true);
+              this.animation = "sprintUpPlayerM";
             } else if (
               (cursors.a.isDown && cursors.s.isDown) ||
               (cursors.left.isDown && cursors.down.isDown)
             ) {
-              this.setVelocity(-crawlVelocity, crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(-sprintVelocit, sprintVelocit);
+              this.anims.play("sprintDownPlayerM", true);
+              this.animation = "sprintDownPlayerM";
             } else if (
               (cursors.d.isDown && cursors.w.isDown) ||
               (cursors.right.isDown && cursors.up.isDown)
             ) {
-              this.setVelocity(crawlVelocity, -crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(sprintVelocit, -sprintVelocit);
+              this.anims.play("sprintUpPlayerM", true);
+              this.animation = "sprintUpPlayerM";
             } else if (
               (cursors.d.isDown && cursors.s.isDown) ||
               (cursors.right.isDown && cursors.down.isDown)
             ) {
-              this.setVelocity(crawlVelocity, crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocity(sprintVelocit, sprintVelocit);
+              this.anims.play("sprintDownPlayerM", true);
+              this.animation = "sprintDownPlayerM";
             } else if (cursors.a.isDown || cursors.left.isDown) {
-              this.setVelocityX(-crawlVelocity);
-              this.flipX = true;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocityX(-sprintVelocit);
+              this.anims.play("sprintLeftPlayerM", true);
+              this.animation = "sprintLeftPlayerM";
             } else if (cursors.d.isDown || cursors.right.isDown) {
-              this.setVelocityX(crawlVelocity);
-              this.flipX = false;
-              this.anims.play("sprint", true);
-              this.animation = "sprint";
+              this.setVelocityX(sprintVelocit);
+              this.anims.play("sprintRightPlayerM", true);
+              this.animation = "sprintRightPlayerM";
             } else if (cursors.w.isDown || cursors.up.isDown) {
-              this.setVelocityY(-crawlVelocity);
-              this.anims.play("sprintUp", true);
-              this.animation = "sprintUp";
+              this.setVelocityY(-sprintVelocit);
+              this.anims.play("sprintUpPlayerM", true);
+              this.animation = "sprintUpPlayerM";
             } else if (cursors.s.isDown || cursors.down.isDown) {
-              this.setVelocityY(crawlVelocity);
-              this.anims.play("sprintDown", true);
-              this.animation = "sprintDown";
+              this.setVelocityY(sprintVelocit);
+              this.anims.play("sprintDownPlayerM", true);
+              this.animation = "sprintDownPlayerM";
             }
           }
           // Walk movement
@@ -166,64 +175,57 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
           ) {
             this.setVelocity(-velocity, -velocity);
             this.flipX = true;
-            this.anims.play("up", true);
-            this.animation = "up";
+            this.anims.play("walkUpPlayerM", true);
+            this.animation = "walkUpPlayerM";
           } else if (
             (cursors.a.isDown && cursors.s.isDown) ||
             (cursors.left.isDown && cursors.down.isDown)
           ) {
             this.setVelocity(-velocity, velocity);
             this.flipX = true;
-            this.anims.play("down", true);
-            this.animation = "down";
+            this.anims.play("walkDownPlayerM", true);
+            this.animation = "walkDownPlayerM";
           } else if (
             (cursors.d.isDown && cursors.w.isDown) ||
             (cursors.right.isDown && cursors.up.isDown)
           ) {
             this.setVelocity(velocity, -velocity);
             this.flipX = false;
-            this.anims.play("up", true);
-            this.animation = "up";
+            this.anims.play("walkUpPlayerM", true);
+            this.animation = "walkUpPlayerM";
           } else if (
             (cursors.d.isDown && cursors.s.isDown) ||
             (cursors.right.isDown && cursors.down.isDown)
           ) {
             this.setVelocity(velocity, velocity);
             this.flipX = false;
-            this.anims.play("down", true);
-            this.animation = "down";
+            this.anims.play("walkDownPlayerM", true);
+            this.animation = "walkDownPlayerM";
           }
           // Straight walk
           else if (cursors.a.isDown || cursors.left.isDown) {
             this.setVelocityX(-velocity);
-            this.flipX = true;
-            this.anims.play("right", true);
-            this.animation = "right";
+            this.anims.play("walkLeftPlayerM", true);
+            this.animation = "walkLeftPlayerM";
           } else if (cursors.d.isDown || cursors.right.isDown) {
             this.setVelocityX(velocity);
             this.flipX = false;
-            this.anims.play("right", true);
-            this.animation = "right";
+            this.anims.play("walkRightPlayerM", true);
+            this.animation = "walkRightPlayerM";
           } else if (cursors.w.isDown || cursors.up.isDown) {
             this.setVelocityY(-velocity);
-            this.anims.play("up", true);
-            this.animation = "up";
+            this.anims.play("walkUpPlayerM", true);
+            this.animation = "walkUpPlayerM";
           } else if (cursors.s.isDown || cursors.down.isDown) {
             this.setVelocityY(velocity);
-            this.anims.play("down", true);
-            this.animation = "down";
-          }
-          // Extra animations
-          else if (cursors.space.isDown) {
-            this.setVelocity(0, 0);
-            this.anims.play("cute", true);
-            this.animation = "cute";
+            this.anims.play("walkDownPlayerM", true);
+            this.animation = "walkDownPlayerM";
           }
           // Idle animation
           else {
             this.setVelocity(0, 0);
-            this.anims.play("idle", true);
-            this.animation = "idle";
+            this.anims.play("idlePlayerM", true);
+            this.animation = "idlePlayerM";
           }
     
           // **Fix: Explicitly stop movement when keys are released**
@@ -247,6 +249,7 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
     
           // Emit the animation state to the server if it has changed
           if (this.animation !== previousAnimation) {
+            console.log("Animation state:", this.animation);
             this.socket.emit("setPlayerAnimation", this.animation);
           }
         }

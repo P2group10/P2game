@@ -17,7 +17,7 @@ const port = 5001;
 const MAX_PLAYERS_PER_ROOM = 7;
 const ROOM_ID_LENGTH = 6;
 
-// Track active rooms
+//----------------- Track active rooms-----------------//
 const activeRooms = {};
 
 app.use(express.static("public"));
@@ -26,12 +26,12 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
-// Socket.io connection handler
+//------------------ Socket.io connection handler----------//
 io.on("connection", (socket) => {
   console.log(`New user connected: ${socket.id}`);
   console.log(`Total connections: ${io.engine.clientsCount}`);
 
-  // Handle room creation
+  //--------------- Handle room creation----------------//
   socket.on("create-room", (data) => {
     const { roomCode } = data;
     // Create the room with initial state
@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
     console.log(`[ROOM CREATED] Room: ${roomCode}, Creator: ${socket.id}`);
   });
 
-  // Handle room joining
+  //-------------------- Handle room joining ------------------//
   socket.on("join-room", (data) => {
     const { roomCode } = data;
     const room = activeRooms[roomCode];
@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
     console.log(activeRooms[roomCode].players);
   });
 
-  // Handle character selection
+  //------------------------ Handle character selection ------------------//
   socket.on("select-character", (data) => {
     const { roomCode, characterId } = data;
     const room = activeRooms[roomCode];
@@ -163,10 +163,11 @@ io.on("connection", (socket) => {
       io.to(roomCode).emit("all-players-ready");
     }
   });
-
+  // ------------------ Handle gamestate -------------------//
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
-
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
+    console.log(`[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`);
     // Use data from the emitted event instead of undefined player object
     console.table({
       playerId: socket.id,
@@ -174,10 +175,9 @@ io.on("connection", (socket) => {
       x: data.x,
       y: data.y,
       animation: data.animation,
-      spriteModel: data.spriteModel,
+      Character: data.spriteModel,
+      playerHp: data.playerHP,
     });
-
-    console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
 
     // Only emit to others in the same room
     socket.to(roomCode).emit("playerPositionUpdate", {
@@ -186,14 +186,13 @@ io.on("connection", (socket) => {
       x: data.x,
       y: data.y,
       animation: data.animation,
-      spriteModel: data.spriteModel,
+      Character: data.spriteModel,
+      playerHp: data.playerHP,
     });
-    console.log(
-      `[PLAYER POSITION] Room: ${roomCode}, Player: ${data.playerName} (${socket.id})`
-    );
+    
   });
 
-  // Handle disconnection
+  //--------------------------- Handle disconnection ------------------------//
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
       const room = activeRooms[roomCode];
