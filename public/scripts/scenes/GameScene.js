@@ -215,7 +215,6 @@ export default class GameScene extends Phaser.Scene {
     return remotePlayer;
   }
 
-
   update() {
     if (this.player) {
       this.player.update(this.cursors);
