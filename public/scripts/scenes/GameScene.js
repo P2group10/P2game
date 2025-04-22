@@ -1,5 +1,6 @@
 import character1 from "/scripts/PlayerCharacters/Character1.js";
 import character2 from "/scripts/PlayerCharacters/Character2.js";
+import HUD from "/scripts/Hud/hud.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -54,9 +55,10 @@ export default class GameScene extends Phaser.Scene {
     // Set up socket listeners for other players
     this.setupSocketListeners();
 
+    this.hud = new HUD(this);
+
     const walkthrough = map.createLayer("walk through", tileset, 0, 0);
     this.walkthrough = walkthrough;
-
 
     this.socket.emit("playerPosition", {
       roomCode: this.roomCode,
@@ -68,7 +70,7 @@ export default class GameScene extends Phaser.Scene {
       spriteModel: this.character,
       playerHP: this.player.playerHP,
     });
-    
+
     // Set initial position
     this.previousX = this.player.x;
     this.previousY = this.player.y;
@@ -90,6 +92,8 @@ export default class GameScene extends Phaser.Scene {
       down: Phaser.Input.Keyboard.KeyCodes.DOWN,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+      one: Phaser.Input.Keyboard.KeyCodes.ONE,
+      two: Phaser.Input.Keyboard.KeyCodes.TWO
     });
   }
 
@@ -100,7 +104,6 @@ export default class GameScene extends Phaser.Scene {
     let texture;
 
     console.log("Creating local player with character:", this.character);
-
 
     switch (this.character) {
       case "character1":
@@ -118,9 +121,23 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (this.character === "character1") {
-      this.player = new character1(this, startX, startY, texture, playerHP, this.socket);
+      this.player = new character1(
+        this,
+        startX,
+        startY,
+        texture,
+        playerHP,
+        this.socket
+      );
     } else {
-      this.player = new character2(this, startX, startY, texture, playerHP, this.socket);
+      this.player = new character2(
+        this,
+        startX,
+        startY,
+        texture,
+        playerHP,
+        this.socket
+      );
     }
     this.player.playerHP = playerHP;
     this.player.isLocalPlayer = true;
@@ -131,18 +148,17 @@ export default class GameScene extends Phaser.Scene {
     camera.setZoom(3);
   }
 
-
   setupSocketListeners() {
     // Listen for other players' position updates
     this.socket.on("playerPositionUpdate", (data) => {
       // Skip if this is our own player
       if (data.playerId === this.socket.id) return;
-      
+
       // Create player if it doesn't exist yet
       if (!this.otherPlayers[data.playerId]) {
         this.createRemotePlayer(data);
       }
-      
+
       // Update existing player
       const otherPlayer = this.otherPlayers[data.playerId];
       if (otherPlayer) {
@@ -152,7 +168,10 @@ export default class GameScene extends Phaser.Scene {
         otherPlayer.playerHp = data.playerHp;
         otherPlayer.spriteModel = data.spriteModel;
         // Play the correct animation
-        if (data.animation && otherPlayer.anims.currentAnim?.key !== data.animation) {
+        if (
+          data.animation &&
+          otherPlayer.anims.currentAnim?.key !== data.animation
+        ) {
           otherPlayer.play(data.animation);
           if (data.animation) {
             if (data.spriteModel === "character1") {
@@ -177,52 +196,63 @@ export default class GameScene extends Phaser.Scene {
 
   createRemotePlayer(data) {
     console.log("Creating remote player with character:", data.spriteModel);
-  
+
     let remotePlayer;
-    
+
     // Create the appropriate character based on their selected model
     if (data.spriteModel === "character1") {
-      remotePlayer = new character1(this, data.x, data.y, 'PlayerM');
+      remotePlayer = new character1(this, data.x, data.y, "PlayerM");
     } else if (data.spriteModel === "character2") {
-      remotePlayer = new character2(this, data.x, data.y, 'TestPlayer');
+      remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
     } else {
       // Default case
-      remotePlayer = new character2(this, data.x, data.y, 'TestPlayer');
+      remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
     }
-    
+
     remotePlayer.isLocalPlayer = false;
     remotePlayer.name = data.playerName;
-    
+
     // Create a name label above the player
-    const nameText = this.add.text(data.x, data.y - 25, data.playerName, { 
-      fontSize: '10px', 
-      fill: '#ffffff',
-      backgroundColor: '#00000080', 
-      padding: { x: 3, y: 1 }
+    const nameText = this.add.text(data.x, data.y - 25, data.playerName, {
+      fontSize: "10px",
+      fill: "#ffffff",
+      backgroundColor: "#00000080",
+      padding: { x: 3, y: 1 },
     });
     nameText.setOrigin(0.5, 0.5);
-    
+
     // Store the text reference with the player
     remotePlayer.nameText = nameText;
-    
+
     // Store the remote player
     this.otherPlayers[data.playerId] = remotePlayer;
-    
+
     // Play initial animation if available
     if (data.animation) {
       if (data.spriteModel === "character1") {
-      remotePlayer.character1.play(data.animation);
+        remotePlayer.character1.play(data.animation);
       } else if (data.spriteModel === "character2") {
         remotePlayer.character2.play(data.animation);
       }
     }
-    
+
     return remotePlayer;
   }
 
   update() {
     if (this.player) {
       this.player.update(this.cursors);
+
+      // Testing damage when "1" is pressed
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
+      // Take damage
+      this.player.takeDamage(10); // Reduce health by 10
+    }
+      // Testing healing when "2" is pressed.
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.two)) {
+      // Heal
+      this.player.heal(10); // Increase health by 10
+    }
 
       for (const playerId in this.otherPlayers) {
         const player = this.otherPlayers[playerId];
@@ -245,8 +275,8 @@ export default class GameScene extends Phaser.Scene {
       }
       if (
         this.player.x !== this.previousX ||
-        this.player.y !== this.previousY)
-        {
+        this.player.y !== this.previousY
+      ) {
         this.socket.emit("playerPosition", {
           roomCode: this.roomCode,
           playerId: this.socket.id,
@@ -260,7 +290,8 @@ export default class GameScene extends Phaser.Scene {
 
         // Update the previous position
         this.previousX = this.player.x;
-        this.previousY = this.player.y;      }
+        this.previousY = this.player.y;
+      }
     }
   }
 }
