@@ -193,6 +193,11 @@ io.on("connection", (socket) => {
     );
   });
 
+  //Handle shooting
+  socket.on("shoot", (data) => {
+    socket.to(data.roomCode).emit("player-shoot", data);
+  });
+
   // Handle disconnection
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
