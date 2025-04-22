@@ -163,7 +163,7 @@ io.on("connection", (socket) => {
       io.to(roomCode).emit("all-players-ready");
     }
   });
-  // ------------------ Handle gamestate -------------------//
+  //------------------ Handle gamestate -------------------//
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
     console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
@@ -192,7 +192,12 @@ io.on("connection", (socket) => {
     
   });
 
-  //--------------------------- Handle disconnection ------------------------//
+
+  socket.on("shoot", (data) => {
+    socket.to(data.roomCode).emit("player-shoot", data);
+  });
+
+
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
       const room = activeRooms[roomCode];
