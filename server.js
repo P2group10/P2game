@@ -163,7 +163,7 @@ io.on("connection", (socket) => {
       io.to(roomCode).emit("all-players-ready");
     }
   });
-  // ------------------ Handle gamestate -------------------//
+  //------------------ Handle gamestate -------------------//
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
     console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);

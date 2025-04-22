@@ -4,7 +4,7 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         // Store the scene and socket for later use
         this.scene = scene;
         this.socket = socket; // Store the socket instance
-        this.animation = "idle";
+        this.animation = "idlePlayerM";
         this.isLocalPlayer = false; // Default to false, set to true for the local player
         // Add the player to the scene and enable physics
         scene.add.existing(this);
