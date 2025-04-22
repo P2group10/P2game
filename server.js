@@ -192,7 +192,12 @@ io.on("connection", (socket) => {
     
   });
 
-  //--------------------------- Handle disconnection ------------------------//
+
+  socket.on("shoot", (data) => {
+    socket.to(data.roomCode).emit("player-shoot", data);
+  });
+
+
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
       const room = activeRooms[roomCode];

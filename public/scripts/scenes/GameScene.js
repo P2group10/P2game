@@ -16,6 +16,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("bullet", "assets/images/bullet.png");
     this.load.image("open_tileset", "assets/map/open_tileset.png");
     this.load.tilemapTiledJSON("trialMap", "assets/map/city.json");
 
@@ -41,6 +42,9 @@ export default class GameScene extends Phaser.Scene {
     const buildingLayer = map.createLayer("building", tileset, 0, 0);
     const boxLayer = map.createLayer("boxes", tileset, 0, 0);
     const fencesLayer = map.createLayer("fences", tileset, 0, 0);
+
+    // Group for projectiles
+    this.projectiles = this.physics.add.group();
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -91,6 +95,32 @@ export default class GameScene extends Phaser.Scene {
       down: Phaser.Input.Keyboard.KeyCodes.DOWN,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+      shoot: Phaser.Input.Keyboard.KeyCodes.K
+    });
+  }
+
+  shootProjectile() {
+    const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
+    bullet.setScale(0.1);
+    bullet.setCollideWorldBounds(true);
+    bullet.body.onWorldBounds = true;
+    
+  
+    // Set bullet speed & direction (here, it always shoots right — you can make it based on player's direction)
+    bullet.setVelocityX(400);
+  
+    // Optional: remove bullet after time
+    this.time.delayedCall(1000, () => {
+      bullet.destroy();
+    });
+  
+    // Emit event to other players
+    this.socket.emit("shoot", {
+      roomCode: this.roomCode,
+      x: this.player.x,
+      y: this.player.y,
+      velocityX: 400,
+      velocityY: 0,
     });
   }
 
@@ -169,6 +199,14 @@ export default class GameScene extends Phaser.Scene {
       }
     });
 
+    // Shooting
+    this.socket.on("player-shoot", (data) => {
+      const bullet = this.projectiles.create(data.x, data.y, "bullet");
+      bullet.setScale(0.1);
+      bullet.setVelocity(data.velocityX, data.velocityY);
+      this.time.delayedCall(2000, () => bullet.destroy());
+    });
+
     // Handle player disconnection
     this.socket.on("player-left", (playerId) => {
       // Remove the player sprite if they exist
@@ -223,6 +261,10 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
+      this.shootProjectile();
+    }
+
     if (this.player) {
       this.player.update(this.cursors);
 
