@@ -1,5 +1,6 @@
 import character1 from "/scripts/PlayerCharacters/Character1.js";
 import character2 from "/scripts/PlayerCharacters/Character2.js";
+import characterAnims from "../PlayerCharacters/CharacterAnims.js";
 import HUD from "/scripts/Hud/hud.js";
 
 export default class GameScene extends Phaser.Scene {
@@ -60,12 +61,11 @@ export default class GameScene extends Phaser.Scene {
     this.createLocalPlayer();
     // Set up socket listeners for other players
     this.setupSocketListeners();
-
+    characterAnims.createAnimations(this);
 
     this.player.facing = { x: 1, y: 0 }; // default: højre
 
     this.hud = new HUD(this);
-
 
     const walkthrough = map.createLayer("walk through", tileset, 0, 0);
     this.walkthrough = walkthrough;
@@ -76,7 +76,7 @@ export default class GameScene extends Phaser.Scene {
       playerName: this.player.name,
       x: this.player.x,
       y: this.player.y,
-      animation: this.player.anims.currentAnim?.key || "idle",
+      animation: this.player.anims.currentAnim?.key,
       spriteModel: this.character,
       playerHP: this.player.playerHP,
     });
@@ -93,7 +93,7 @@ export default class GameScene extends Phaser.Scene {
     // bullet collisions for buildings and trees
     this.physics.add.collider(this.projectiles, buildingLayer, (bullet) => {
       bullet.destroy();
-    });   
+    });
     this.physics.add.collider(this.projectiles, treea01Layer, (bullet) => {
       bullet.destroy();
     });
@@ -104,20 +104,23 @@ export default class GameScene extends Phaser.Scene {
       bullet.destroy();
     });
 
-    this.physics.add.overlap(this.projectiles, this.otherPlayersGroup, (bullet, player) => {
-      bullet.destroy();
-    
-      this.socket.emit("player-hit", {
-        attackerId: this.socket.id,
-        victimId: player.playerId, // Use a unique ID or socket ID if available
-        roomCode: this.roomCode,
-        damage: 20,
-      });
+    this.physics.add.overlap(
+      this.projectiles,
+      this.otherPlayersGroup,
+      (bullet, player) => {
+        if (bullet.shooterId !== player.playerId) {
+          bullet.destroy();
+          this.socket.emit("player-hit", {
+            attackerId: this.socket.id,
+            victimId: player.playerId, // Use a unique ID or socket ID if available
+            roomCode: this.roomCode,
+            damage: 20,
+          });
 
-      console.log("💥 Bullet hit player:", player.playerId);
-
-    });
-    
+          console.log("💥 Bullet hit player:", player.playerId);
+        }
+      }
+    );
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
@@ -132,50 +135,55 @@ export default class GameScene extends Phaser.Scene {
       shoot: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
 
-
       one: Phaser.Input.Keyboard.KeyCodes.ONE,
       two: Phaser.Input.Keyboard.KeyCodes.TWO,
-
     });
   }
 
   // shoot function
   shootProjectile() {
-    const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
+    const bullet = this.projectiles.create(
+      this.player.x,
+      this.player.y,
+      "bullet"
+    );
     bullet.setScale(0.1);
     bullet.setCollideWorldBounds(true);
     bullet.body.onWorldBounds = true;
-  
+
+    bullet.shooterId = this.socket.id;
+
     const speed = 400;
     const { x: facingX, y: facingY } = this.player.facing;
-  
+
     const velocityX = facingX * speed;
     const velocityY = facingY * speed;
-  
+
     bullet.setVelocity(velocityX, velocityY);
-  
+
     // Beregn vinkel (i grader) og sæt rotation
-    if (facingX !== 0 || facingY !== 0) {
       const angleRad = Math.atan2(facingY, facingX); // radians
       const angleDeg = Phaser.Math.RadToDeg(angleRad); // konverter til grader
       bullet.setAngle(angleDeg);
-    }
-  
+    
+
     this.time.delayedCall(1000, () => {
       bullet.destroy();
     });
-  
+
     this.socket.emit("shoot", {
       roomCode: this.roomCode,
       x: this.player.x,
       y: this.player.y,
       velocityX: velocityX,
       velocityY: velocityY,
+      angle: angleDeg,
+      speed: speed,
+      facingX: facingX,
+      facingY: facingY,
+      playerId: this.socket.id,
     });
   }
-  
-
-  
 
   createLocalPlayer() {
     let startX = 400;
@@ -256,10 +264,16 @@ export default class GameScene extends Phaser.Scene {
           if (data.animation) {
             otherPlayer.play(data.animation);
             if (data.spriteModel === "character1") {
-              console.log("Creating remote player with character1:", data.animation);
+              console.log(
+                "Creating remote player with character1:",
+                data.animation
+              );
               otherPlayer.play(data.animation);
             } else if (data.spriteModel === "character2") {
-              console.log("Creating remote player with character2:", data.animation);
+              console.log(
+                "Creating remote player with character2:",
+                data.animation
+              );
               otherPlayer.play(data.animation);
             }
           }
@@ -271,20 +285,40 @@ export default class GameScene extends Phaser.Scene {
     this.socket.on("player-shoot", (data) => {
       const bullet = this.projectiles.create(data.x, data.y, "bullet");
       bullet.setScale(0.1);
-      bullet.setVelocity(data.velocityX, data.velocityY);
-      this.time.delayedCall(1000, () => bullet.destroy());
-    });
 
+      // Make sure we use the same speed for remote bullets
+      bullet.setVelocity(data.velocityX, data.velocityY);
+
+      // Set the bullet angle
+      if (data.angle !== undefined) {
+        bullet.setAngle(data.angle);
+      } else {
+        // Calculate angle from velocity components as fallback
+        const angleRad = Math.atan2(data.velocityY, data.velocityX);
+        const angleDeg = Phaser.Math.RadToDeg(angleRad);
+        bullet.setAngle(angleDeg);
+      }
+
+      bullet.shooterId = data.playerId;
+
+      this.time.delayedCall(1000, () => bullet.destroy());
+      console.log(
+        "Remote bullet fired with velocity:",
+        data.velocityX,
+        data.velocityY
+      );
+    });
     // Damage applied
     this.socket.on("apply-damage", (data) => {
       if (this.socket.id === data.victimId) {
         this.player.playerHP -= data.damage;
-    
-        console.log(`You took ${data.damage} damage. HP: ${this.player.playerHP}`);
-    
+
+        console.log(
+          `You took ${data.damage} damage. HP: ${this.player.playerHP}`
+        );
+
         if (this.player.playerHP <= 0) {
           console.log("💀 You died!");
-        
         }
       }
     });
@@ -304,9 +338,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Create the appropriate character based on their selected model
     if (data.spriteModel === "character1") {
-      remotePlayer = new character1(this, data.x, data.y, 'PlayerM');
+      remotePlayer = new character1(this, data.x, data.y, "PlayerM");
     } else if (data.spriteModel === "character2") {
-      remotePlayer = new character2(this, data.x, data.y, 'TestPlayer');
+      remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
       startAnimation = "idlePlayerM";
     } else {
       // Default case
@@ -318,14 +352,13 @@ export default class GameScene extends Phaser.Scene {
 
     remotePlayer.playerId = data.playerId;
     remotePlayer.playerHP = data.playerHP;
-    
 
     // Create a name label above the player
-    const nameText = this.add.text(data.x, data.y - 25, data.playerName, { 
-      fontSize: '5px', 
-      fill: '#ffffff',
-      backgroundColor: '#00000080', 
-      padding: { x: 3, y: 1 }
+    const nameText = this.add.text(data.x, data.y - 25, data.playerName, {
+      fontSize: "5px",
+      fill: "#ffffff",
+      backgroundColor: "#00000080",
+      padding: { x: 3, y: 1 },
     });
     nameText.setOrigin(0.5, 0.5);
 
@@ -337,7 +370,6 @@ export default class GameScene extends Phaser.Scene {
 
     // Play initial animation if available
     if (data.animation) {
-
       if (data.spriteModel === "character1") {
         remotePlayer.character1.play(data.animation);
       } else if (data.spriteModel === "character2") {
@@ -347,7 +379,6 @@ export default class GameScene extends Phaser.Scene {
 
     // add remote player to group for collisions with projectile
     this.otherPlayersGroup.add(remotePlayer);
-
 
     return remotePlayer;
   }
@@ -360,37 +391,33 @@ export default class GameScene extends Phaser.Scene {
     if (this.player) {
       this.player.update(this.cursors);
 
- 
       let x = 0;
       let y = 0;
-      
+
       if (this.cursors.w.isDown) y = -1;
       if (this.cursors.s.isDown) y = 1;
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
-      
+
       this.player.facing = { x, y };
-      
+
       // Flip sprite hvis man går til venstre
-      if (x < 0) {
+      /* if (x < 0) {
         this.player.setFlipX(true);
       } else if (x > 0) {
         this.player.setFlipX(false);
-      }
-      
-
+      } */
 
       // Testing damage when "1" is pressed
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
-      // Take damage
-      this.player.takeDamage(10); // Reduce health by 10
-    }
+      if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
+        // Take damage
+        this.player.takeDamage(10); // Reduce health by 10
+      }
       // Testing healing when "2" is pressed.
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.two)) {
-      // Heal
-      this.player.heal(10); // Increase health by 10
-    }
-
+      if (Phaser.Input.Keyboard.JustDown(this.cursors.two)) {
+        // Heal
+        this.player.heal(10); // Increase health by 10
+      }
 
       for (const playerId in this.otherPlayers) {
         const player = this.otherPlayers[playerId];
@@ -411,7 +438,7 @@ export default class GameScene extends Phaser.Scene {
       } else {
         this.walkthrough.setAlpha(1);
       }
-      
+
       if (
         this.player.x !== this.previousX ||
         this.player.y !== this.previousY
@@ -429,8 +456,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Update the previous position
         this.previousX = this.player.x;
-        this.previousY = this.player.y;      
-
+        this.previousY = this.player.y;
       }
     }
   }

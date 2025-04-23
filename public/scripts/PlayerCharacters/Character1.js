@@ -1,28 +1,32 @@
+import CharacterAnims from "../PlayerCharacters/CharacterAnims.js";
+
 export default class character1 extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, playerHP, socket) {
-        super(scene, x, y, texture);
-        // Store the scene and socket for later use
-        this.scene = scene;
-        this.socket = socket; // Store the socket instance
-        this.animation = "idleTestPlayer";
-        this.isLocalPlayer = false; // Default to false, set to true for the local player
-        // Add the player to the scene and enable physics
-        scene.add.existing(this);
-        scene.physics.add.existing(this); // Corrected line
-        //Add health for healtbar logic
-        this.health = playerHP;
-        this.maxHealth = playerHP;
+  constructor(scene, x, y, texture, playerHP, socket) {
+    super(scene, x, y, texture);
+    // Store the scene and socket for later use
+    this.scene = scene;
+    this.socket = socket; 
+    this.animation = "idleTestPlayer";
+    this.isLocalPlayer = false; 
     
-        // Set player properties
-        this.setScale(0.5);
-        this.setCollideWorldBounds(true);
+    // Add the player to the scene and enable physics
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
     
-        //Physics body
-        this.body.setCircle(16, 16, 16);
+    //Add health for healthbar logic
+    this.health = playerHP || 100; // Default value if not provided
+    this.maxHealth = this.health;
+
+    // Set player properties
+    this.setScale(0.5);
+    this.setCollideWorldBounds(true);
+
+    //Physics body
+    this.body.setCircle(16, 16, 16);
     
-        // Define animations
-        this.createAnimations(scene);
-      }
+    // Ensure animations are created (only needed once)
+    CharacterAnims.createAnimations(scene);
+}
 
       createAnimations(scene) {
         // Define animations

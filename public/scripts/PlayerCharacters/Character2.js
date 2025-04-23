@@ -1,118 +1,33 @@
+import CharacterAnims from "../PlayerCharacters/CharacterAnims.js";
 export default class character2 extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, texture, playerHP, socket) {
-        super(scene, x, y, texture);
-        // Store the scene and socket for later use
-        this.scene = scene;
-        this.socket = socket; // Store the socket instance
-        this.animation = "idlePlayerM";
-        this.isLocalPlayer = false; // Default to false, set to true for the local player
-        // Add the player to the scene and enable physics
-        scene.add.existing(this);
-        scene.physics.add.existing(this); // Corrected line
+  constructor(scene, x, y, texture, playerHP, socket) {
+    super(scene, x, y, texture);
+    // Store the scene and socket for later use
+    this.scene = scene;
+    this.socket = socket; 
+    this.animation = "idlePlayerM";
+    this.isLocalPlayer = false; 
     
-        // Set player properties
-        this.setScale(0.5);
-        this.setCollideWorldBounds(true);
+    // Add the player to the scene and enable physics
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
     
-        //Physics body
-        this.body.setCircle(16, 16, 16);
-    
-        // Define animations
-        this.createAnimations(scene);
-      }
+    //Add health for healthbar logic
+    this.health = playerHP || 100; // Default value if not provided
+    this.maxHealth = this.health;
 
-      createAnimations(scene) {
-        // Define animations
-        scene.anims.create({
-          key: "walkUpPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 105,
-            end: 112,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-    
-        scene.anims.create({
-          key: "walkDownPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 131,
-            end: 138,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-    
-        scene.anims.create({
-          key: "walkRightPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 144,
-            end: 151,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
+    // Set player properties
+    this.setScale(0.5);
+    this.setCollideWorldBounds(true);
 
-        scene.anims.create({
-          key: "walkLeftPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 118,
-            end: 125,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
+    //Physics body
+    this.body.setCircle(16, 16, 16);
     
-        scene.anims.create({
-          key: "idlePlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 27,
-            end: 29,
-          }),
-          frameRate: 5,
-          repeat: -1,
-        });
+    // Ensure animations are created (only needed once)
+    CharacterAnims.createAnimations(scene);
+}
 
-        scene.anims.create({
-          key: "sprintLeftPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 507,
-            end: 514,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-    
-        scene.anims.create({
-          key: "sprintRightPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 533,
-            end: 540,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-    
-        scene.anims.create({
-          key: "sprintUpPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 494,
-            end: 500,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-    
-        scene.anims.create({
-          key: "sprintDownPlayerM",
-          frames: scene.anims.generateFrameNumbers("PlayerM", {
-            start: 520,
-            end: 527,
-          }),
-          frameRate: 20,
-          repeat: -1,
-        });
-      }
+
     
       update(cursors) {
         let velocity = 160;
