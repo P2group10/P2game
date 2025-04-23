@@ -43,8 +43,9 @@ export default class GameScene extends Phaser.Scene {
     const boxLayer = map.createLayer("boxes", tileset, 0, 0);
     const fencesLayer = map.createLayer("fences", tileset, 0, 0);
 
-    // Group for projectiles
+    // Group for projectiles and other players. Group is used so we can use physics such as overlaps
     this.projectiles = this.physics.add.group();
+    this.otherPlayersGroup = this.physics.add.group();
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -83,6 +84,35 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, boxLayer);
     this.physics.add.collider(this.player, treea01Layer);
 
+    // bullet collisions for buildings and trees
+    this.physics.add.collider(this.projectiles, buildingLayer, (bullet) => {
+      bullet.destroy();
+    });   
+    this.physics.add.collider(this.projectiles, treea01Layer, (bullet) => {
+      bullet.destroy();
+    });
+    this.physics.add.collider(this.projectiles, fencesLayer, (bullet) => {
+      bullet.destroy();
+    });
+    this.physics.add.collider(this.projectiles, boxLayer, (bullet) => {
+      bullet.destroy();
+    });
+
+    this.physics.add.overlap(this.projectiles, this.otherPlayersGroup, (bullet, player) => {
+      bullet.destroy();
+    
+      this.socket.emit("player-hit", {
+        attackerId: this.socket.id,
+        victimId: player.playerId, // Use a unique ID or socket ID if available
+        roomCode: this.roomCode,
+        damage: 20,
+      });
+
+      console.log("💥 Bullet hit player:", player.playerId);
+
+    });
+    
+
     // Controls
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
@@ -93,12 +123,12 @@ export default class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.LEFT,
       up: Phaser.Input.Keyboard.KeyCodes.UP,
       down: Phaser.Input.Keyboard.KeyCodes.DOWN,
-      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      shoot: Phaser.Input.Keyboard.KeyCodes.SPACE,
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
-      shoot: Phaser.Input.Keyboard.KeyCodes.K
     });
   }
 
+  // shoot function
   shootProjectile() {
     const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
     bullet.setScale(0.1);
@@ -123,6 +153,8 @@ export default class GameScene extends Phaser.Scene {
       velocityY: 0,
     });
   }
+
+  
 
   createLocalPlayer() {
     let startX = 400;
@@ -180,7 +212,7 @@ export default class GameScene extends Phaser.Scene {
         // Move player to new position
         otherPlayer.x = data.x;
         otherPlayer.y = data.y;
-        otherPlayer.playerHp = data.playerHp;
+        otherPlayer.playerHP = data.playerHP;
         otherPlayer.spriteModel = data.spriteModel;
         // Play the correct animation
         if (data.animation && otherPlayer.anims.currentAnim?.key !== data.animation) {
@@ -204,7 +236,21 @@ export default class GameScene extends Phaser.Scene {
       const bullet = this.projectiles.create(data.x, data.y, "bullet");
       bullet.setScale(0.1);
       bullet.setVelocity(data.velocityX, data.velocityY);
-      this.time.delayedCall(2000, () => bullet.destroy());
+      this.time.delayedCall(1000, () => bullet.destroy());
+    });
+
+    // Damage applied
+    this.socket.on("apply-damage", (data) => {
+      if (this.socket.id === data.victimId) {
+        this.player.playerHP -= data.damage;
+    
+        console.log(`You took ${data.damage} damage. HP: ${this.player.playerHP}`);
+    
+        if (this.player.playerHP <= 0) {
+          console.log("💀 You died!");
+        
+        }
+      }
     });
 
     // Handle player disconnection
@@ -236,6 +282,8 @@ export default class GameScene extends Phaser.Scene {
     
     remotePlayer.isLocalPlayer = false;
     remotePlayer.name = data.playerName;
+    remotePlayer.playerId = data.playerId;
+    remotePlayer.playerHP = data.playerHP;
     
     // Create a name label above the player
     const nameText = this.add.text(data.x, data.y - 25, data.playerName, { 
@@ -257,6 +305,10 @@ export default class GameScene extends Phaser.Scene {
       console.log("Creating remote player with character2:", data.animation);
         remotePlayer.play(data.animation);
     }
+
+    // add remote player to group for collisions with projectile
+    this.otherPlayersGroup.add(remotePlayer);
+
     return remotePlayer;
   }
 

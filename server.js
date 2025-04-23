@@ -192,11 +192,15 @@ io.on("connection", (socket) => {
     
   });
 
-
+// Handle projectile shoot
   socket.on("shoot", (data) => {
     socket.to(data.roomCode).emit("player-shoot", data);
   });
 
+  // Handle procetile hit and damage
+  socket.on("player-hit", (data) => {
+    io.to(data.roomCode).emit("apply-damage", data);
+  });
 
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
