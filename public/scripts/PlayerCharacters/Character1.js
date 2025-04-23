@@ -9,6 +9,9 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
         // Add the player to the scene and enable physics
         scene.add.existing(this);
         scene.physics.add.existing(this); // Corrected line
+        //Add health for healtbar logic
+        this.health = playerHP;
+        this.maxHealth = playerHP;
     
         // Set player properties
         this.setScale(0.5);
@@ -253,6 +256,24 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
             this.socket.emit("setPlayerAnimation", this.animation);
           }
         }
+      }
+      takeDamage(amount){
+        this.health -= amount;
+        if (this.health < 0){
+          this.health = 0;
+        }
+
+        //Emit an event to notify about the damage
+        this.scene.events.emit("playerHealthChanged", this.health, this.maxHealth);
+      }
+      heal(amount){
+        this.health += amount;
+        if (this.health > this.maxHealth){
+          this.health = this.maxHealth;
+        }
+        
+        //Emit an event to notify about the heal
+        this.scene.events.emit("playerHealthChanged", this.health, this.maxHealth);
       }
     }
     
