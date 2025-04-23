@@ -60,7 +60,11 @@ export default class GameScene extends Phaser.Scene {
     // Set up socket listeners for other players
     this.setupSocketListeners();
 
+
+    this.player.facing = { x: 1, y: 0 }; // default: højre
+
     this.hud = new HUD(this);
+
 
     const walkthrough = map.createLayer("walk through", tileset, 0, 0);
     this.walkthrough = walkthrough;
@@ -109,25 +113,35 @@ export default class GameScene extends Phaser.Scene {
     bullet.setScale(0.1);
     bullet.setCollideWorldBounds(true);
     bullet.body.onWorldBounds = true;
-    
   
-    // Set bullet speed & direction (here, it always shoots right — you can make it based on player's direction)
-    bullet.setVelocityX(400);
+    const speed = 400;
+    const { x: facingX, y: facingY } = this.player.facing;
   
-    // Optional: remove bullet after time
+    const velocityX = facingX * speed;
+    const velocityY = facingY * speed;
+  
+    bullet.setVelocity(velocityX, velocityY);
+  
+    // Beregn vinkel (i grader) og sæt rotation
+    if (facingX !== 0 || facingY !== 0) {
+      const angleRad = Math.atan2(facingY, facingX); // radians
+      const angleDeg = Phaser.Math.RadToDeg(angleRad); // konverter til grader
+      bullet.setAngle(angleDeg);
+    }
+  
     this.time.delayedCall(1000, () => {
       bullet.destroy();
     });
   
-    // Emit event to other players
     this.socket.emit("shoot", {
       roomCode: this.roomCode,
       x: this.player.x,
       y: this.player.y,
-      velocityX: 400,
-      velocityY: 0,
+      velocityX: velocityX,
+      velocityY: velocityY,
     });
   }
+  
 
   createLocalPlayer() {
     let startX = 400;
@@ -290,6 +304,26 @@ export default class GameScene extends Phaser.Scene {
     if (this.player) {
       this.player.update(this.cursors);
 
+ 
+      let x = 0;
+      let y = 0;
+      
+      if (this.cursors.w.isDown) y = -1;
+      if (this.cursors.s.isDown) y = 1;
+      if (this.cursors.a.isDown) x = -1;
+      if (this.cursors.d.isDown) x = 1;
+      
+      this.player.facing = { x, y };
+      
+      // Flip sprite hvis man går til venstre
+      if (x < 0) {
+        this.player.setFlipX(true);
+      } else if (x > 0) {
+        this.player.setFlipX(false);
+      }
+      
+
+
       // Testing damage when "1" is pressed
     if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
       // Take damage
@@ -300,6 +334,7 @@ export default class GameScene extends Phaser.Scene {
       // Heal
       this.player.heal(10); // Increase health by 10
     }
+
 
       for (const playerId in this.otherPlayers) {
         const player = this.otherPlayers[playerId];
