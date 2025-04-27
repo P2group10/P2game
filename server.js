@@ -163,7 +163,7 @@ io.on("connection", (socket) => {
       io.to(roomCode).emit("all-players-ready");
     }
   });
-  //------------------ Handle gamestate -------------------//
+  //-------------------------------- Handle gamestate ---------------------------------------------//
   socket.on("playerPosition", (data) => {
     const roomCode = data.roomCode;
     console.log(`[PLAYER POSITION] Room: ${roomCode}, (${socket.id})`);
@@ -202,6 +202,69 @@ io.on("connection", (socket) => {
     io.to(data.roomCode).emit("apply-damage", data);
   });
 
+  //-----------Handle enemy spawns from host-----------------//
+  socket.on("enemy-spawn", (data) => {
+    const { roomCode, enemyId, x, y, texture, hp } = data;
+    // Relay to all clients except sender
+    socket.to(roomCode).emit("enemy-spawn", {
+      enemyId,
+      x,
+      y,
+      texture,
+      hp
+    });
+  });
+  
+  // Handle enemy position updates from host
+  socket.on("enemy-position-update", (data) => {
+    const { roomCode, enemyId, x, y, animation } = data;
+    // Relay to all clients except sender
+    socket.to(roomCode).emit("enemy-position-update", {
+      enemyId,
+      x,
+      y,
+      animation
+    });
+  });
+  
+  // Handle enemy death events
+  socket.on("enemy-killed", (data) => {
+    const { roomCode, enemyId } = data;
+    // Relay to all clients including sender for consistent state
+    io.to(roomCode).emit("enemy-killed", {
+      enemyId
+    });
+  });
+
+
+//-----------------------Handle player death--------------------------//
+socket.on("player-death", (data) => {
+  const { roomCode, playerId } = data;
+  const room = activeRooms[roomCode];
+  if (!room) return;
+
+  // Remove the player from the room
+  const playerIndex = room.players.findIndex(p => p.id === playerId);
+  if (playerIndex !== -1) {
+    room.players.splice(playerIndex, 1);
+    
+    // Notify all clients about the player death
+    io.to(roomCode).emit("player-died", { playerId });
+    
+    // Clean up empty rooms
+    if (room.players.length === 0) {
+      delete activeRooms[roomCode];
+    } else {
+      // Update player list for remaining players
+      io.to(roomCode).emit("player-list-update", room.players);
+    }
+  }
+});
+
+
+
+
+  //---------------------disconnect------------------//
   socket.on("disconnect", () => {
     for (const roomCode in activeRooms) {
       const room = activeRooms[roomCode];
@@ -229,6 +292,7 @@ io.on("connection", (socket) => {
   });
 });
 
+//---------------- Server listening ----------------//
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
