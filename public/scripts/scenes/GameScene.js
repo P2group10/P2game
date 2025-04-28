@@ -260,7 +260,10 @@ export default class GameScene extends Phaser.Scene {
         otherPlayer.spriteModel = data.spriteModel;
 
         // Play the correct animation
-        if ( data.animation && otherPlayer.anims.currentAnim?.key !== data.animation) {
+        if (
+          data.animation &&
+          otherPlayer.anims.currentAnim?.key !== data.animation
+        ) {
           otherPlayer.play(data.animation);
           if (data.animation) {
             otherPlayer.play(data.animation);
@@ -364,27 +367,27 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // Add cleanup method
-cleanupBeforeSceneChange() {
-  // Clean up player
-  if (this.player) {
+  cleanupBeforeSceneChange() {
+    // Clean up player
+    if (this.player) {
       if (this.player.nameText) this.player.nameText.destroy();
       this.player.destroy();
       this.player = null;
-  }
-  
-  // Clean up other players
-  Object.values(this.otherPlayers).forEach(player => {
+    }
+
+    // Clean up other players
+    Object.values(this.otherPlayers).forEach((player) => {
       if (player.nameText) player.nameText.destroy();
       player.destroy();
-  });
-  this.otherPlayers = {};
-  
-  // Remove all socket listeners
-  this.socket.off('player-died');
-  this.socket.off('playerPositionUpdate');
-  this.socket.off('player-shoot');
-  // Add other event listeners you need to remove
-}
+    });
+    this.otherPlayers = {};
+
+    // Remove all socket listeners
+    this.socket.off("player-died");
+    this.socket.off("playerPositionUpdate");
+    this.socket.off("player-shoot");
+    // Add other event listeners you need to remove
+  }
 
   createRemotePlayer(data) {
     if (!this.scene || !this.scene.isActive()) return null;
@@ -543,8 +546,11 @@ cleanupBeforeSceneChange() {
       if (this.cursors.s.isDown) y = 1;
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
-
-      this.player.facing = { x, y };
+      
+      // Kun opdater facing, hvis der er input
+      if (x !== 0 || y !== 0) {
+        this.player.facing = { x, y };
+      }
 
       // Testing damage when "1" is pressed
       if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
