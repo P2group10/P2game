@@ -292,7 +292,9 @@ socket.on("player-death", (data) => {
   });
 });
 
-//---------------- Server listening ----------------//
-server.listen(port, () => {
+// Bind server to '0.0.0.0' to accept connections from any network interface.
+// This allows external access (e.g., cloud hosting) while still supporting localhost development.
+// Local testing with 'localhost:5001' will continue to work normally.
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server listening on port ${port}`);
 });

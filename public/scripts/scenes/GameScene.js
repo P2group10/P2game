@@ -545,12 +545,12 @@ export default class GameScene extends Phaser.Scene {
 
       let x = 0;
       let y = 0;
-
+      
       if (this.cursors.w.isDown) y = -1;
       if (this.cursors.s.isDown) y = 1;
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
-
+      
       // Kun opdater facing, hvis der er input
       if (x !== 0 || y !== 0) {
         this.player.facing = { x, y };
