@@ -6,7 +6,7 @@ export default class GameOverScene extends Phaser.Scene {
   create() {
     // Display "You are dead!" message
     this.add
-      .text(650, 450, "You are dead!", { fontSize: "64px", fill: "#ff0000" })
+      .text(650, 450, "MANCHESTER UNITED SUCKS!!", { fontSize: "64px", fill: "#ff0000" })
       .setOrigin(0.5);
 
       this.time.delayedCall(

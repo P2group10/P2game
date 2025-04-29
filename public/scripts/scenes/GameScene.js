@@ -3,7 +3,6 @@ import character2 from "/scripts/PlayerCharacters/Character2.js";
 import characterAnims from "../PlayerCharacters/CharacterAnims.js";
 import HUD from "/scripts/Hud/hud.js";
 import MultiplayerEnemiesManager from "/scripts/Enemies/enemyManager.js";
-const startAnimation = "idlePlayerM";
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
@@ -112,6 +111,11 @@ export default class GameScene extends Phaser.Scene {
       bullet.destroy();
     });
 
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, fencesLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, buildingLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, boxLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, treea01Layer);
+
     this.physics.add.overlap(
       this.projectiles,
       this.enemiesManager.enemiesGroup,
@@ -199,7 +203,7 @@ export default class GameScene extends Phaser.Scene {
         texture = "PlayerM";
         break;
       case "character2":
-        texture = "TestPlayer";
+        texture = "PlayerM";
         startX = 400;
         startY = 240;
         playerHP = 200;
@@ -546,7 +550,7 @@ export default class GameScene extends Phaser.Scene {
       if (this.cursors.s.isDown) y = 1;
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
-      
+
       // Kun opdater facing, hvis der er input
       if (x !== 0 || y !== 0) {
         this.player.facing = { x, y };

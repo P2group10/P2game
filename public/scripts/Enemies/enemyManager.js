@@ -103,6 +103,7 @@ export default class MultiplayerEnemiesManager {
   setupCollisions(players) {
     const enemiesArray = Object.values(this.enemies);
     this.scene.physics.add.collider(this.enemiesGroup, players, this.handleEnemyCollision.bind(this));
+    this.scene.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
 }
   
   handleEnemyCollision(player) {
