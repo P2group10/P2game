@@ -2,7 +2,7 @@ import character1 from "/scripts/PlayerCharacters/Character1.js";
 import character2 from "/scripts/PlayerCharacters/Character2.js";
 import characterAnims from "../PlayerCharacters/CharacterAnims.js";
 import HUD from "/scripts/Hud/hud.js";
-
+import MultiplayerEnemiesManager from "/scripts/Enemies/enemyManager.js";
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
@@ -31,10 +31,17 @@ export default class GameScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+
+    this.load.spritesheet("zombieB", "assets/zombies/zombieB.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
   }
 
   create() {
-    // Create map layers (unchanged from your original code)
+    this.hud = new HUD(this);
+
+    // Create map layers
     const map = this.make.tilemap({ key: "trialMap" });
     const tileset = map.addTilesetImage("open_tileset", "open_tileset");
     const groundLayer = map.createLayer("ground", tileset, 0, 0);
@@ -63,9 +70,9 @@ export default class GameScene extends Phaser.Scene {
     this.setupSocketListeners();
     characterAnims.createAnimations(this);
 
-    this.player.facing = { x: 1, y: 0 }; // default: højre
+    this.setupEnemies();
 
-    this.hud = new HUD(this);
+    this.player.facing = { x: 1, y: 0 }; // default: højre
 
     const walkthrough = map.createLayer("walk through", tileset, 0, 0);
     this.walkthrough = walkthrough;
@@ -104,21 +111,20 @@ export default class GameScene extends Phaser.Scene {
       bullet.destroy();
     });
 
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, fencesLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, buildingLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, boxLayer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, treea01Layer);
+
     this.physics.add.overlap(
       this.projectiles,
-      this.otherPlayersGroup,
-      (bullet, player) => {
-        if (bullet.shooterId !== player.playerId) {
-          bullet.destroy();
-          this.socket.emit("player-hit", {
-            attackerId: this.socket.id,
-            victimId: player.playerId, // Use a unique ID or socket ID if available
-            roomCode: this.roomCode,
-            damage: 20,
-          });
-
-          console.log("💥 Bullet hit player:", player.playerId);
-        }
+      this.enemiesManager.enemiesGroup,
+      (bullet, enemy) => {
+        // Deal damage to enemy
+        enemy.takeDamage(20); // Adjust damage amount as needed
+        // Destroy bullet
+        bullet.destroy();
+        console.log("💥 Bullet hit enemy:", enemy.id);
       }
     );
 
@@ -162,10 +168,9 @@ export default class GameScene extends Phaser.Scene {
     bullet.setVelocity(velocityX, velocityY);
 
     // Beregn vinkel (i grader) og sæt rotation
-      const angleRad = Math.atan2(facingY, facingX); // radians
-      const angleDeg = Phaser.Math.RadToDeg(angleRad); // konverter til grader
-      bullet.setAngle(angleDeg);
-    
+    const angleRad = Math.atan2(facingY, facingX); // radians
+    const angleDeg = Phaser.Math.RadToDeg(angleRad); // konverter til grader
+    bullet.setAngle(angleDeg);
 
     this.time.delayedCall(1000, () => {
       bullet.destroy();
@@ -198,7 +203,7 @@ export default class GameScene extends Phaser.Scene {
         texture = "PlayerM";
         break;
       case "character2":
-        texture = "TestPlayer";
+        texture = "PlayerM";
         startX = 400;
         startY = 240;
         playerHP = 200;
@@ -210,21 +215,23 @@ export default class GameScene extends Phaser.Scene {
 
     if (this.character === "character1") {
       this.player = new character1(
-        this,
-        startX,
-        startY,
-        texture,
-        playerHP,
-        this.socket
+        this, // scene
+        startX, // x
+        startY, // y
+        texture, // texture
+        playerHP, // playerHP
+        this.socket, // socket
+        this.hud // hud reference
       );
     } else {
       this.player = new character2(
-        this,
-        startX,
-        startY,
-        texture,
-        playerHP,
-        this.socket
+        this, // scene
+        startX, // x
+        startY, // y
+        texture, // texture
+        playerHP, // playerHP
+        this.socket, // socket
+        this.hud // hud reference
       );
     }
     this.player.playerHP = playerHP;
@@ -249,12 +256,13 @@ export default class GameScene extends Phaser.Scene {
 
       // Update existing player
       const otherPlayer = this.otherPlayers[data.playerId];
-      if (otherPlayer) {
+      if (otherPlayer && otherPlayer.active) {
         // Move player to new position
         otherPlayer.x = data.x;
         otherPlayer.y = data.y;
         otherPlayer.playerHP = data.playerHP;
         otherPlayer.spriteModel = data.spriteModel;
+
         // Play the correct animation
         if (
           data.animation &&
@@ -277,6 +285,25 @@ export default class GameScene extends Phaser.Scene {
               otherPlayer.play(data.animation);
             }
           }
+          this.socket.on("player-death", (data) => {
+            const playerId = data.playerId;
+            // If it's our own player, transition to game over
+            if (playerId === this.socket.id) {
+              this.scene.start("GameOverScene", {
+                playerName: this.playerName,
+                roomCode: this.roomCode,
+              });
+              return;
+            }
+            // If it's another player, remove their sprite
+            if (this.otherPlayers[playerId]) {
+              this.otherPlayers[playerId].destroy();
+              if (this.otherPlayers[playerId].nameText) {
+                this.otherPlayers[playerId].nameText.destroy();
+              }
+              delete this.otherPlayers[playerId];
+            }
+          });
         }
       }
     });
@@ -308,18 +335,28 @@ export default class GameScene extends Phaser.Scene {
         data.velocityY
       );
     });
-    // Damage applied
-    this.socket.on("apply-damage", (data) => {
-      if (this.socket.id === data.victimId) {
-        this.player.playerHP -= data.damage;
 
-        console.log(
-          `You took ${data.damage} damage. HP: ${this.player.playerHP}`
-        );
+    this.socket.on("player-died", (data) => {
+      const playerId = data.playerId;
 
-        if (this.player.playerHP <= 0) {
-          console.log("💀 You died!");
-        }
+      // For local player
+      if (data.playerId === this.socket.id) {
+        // Clean up before scene transition
+        this.cleanupBeforeSceneChange();
+        this.scene.start("GameOverScene", {
+          playerName: this.playerName,
+          roomCode: this.roomCode,
+        });
+        return;
+      }
+
+      // For remote players
+      if (this.otherPlayers[data.playerId]) {
+        const player = this.otherPlayers[data.playerId];
+        // Safe cleanup
+        if (player.nameText) player.nameText.destroy();
+        player.destroy();
+        delete this.otherPlayers[data.playerId];
       }
     });
 
@@ -333,7 +370,31 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  // Add cleanup method
+  cleanupBeforeSceneChange() {
+    // Clean up player
+    if (this.player) {
+      if (this.player.nameText) this.player.nameText.destroy();
+      this.player.destroy();
+      this.player = null;
+    }
+
+    // Clean up other players
+    Object.values(this.otherPlayers).forEach((player) => {
+      if (player.nameText) player.nameText.destroy();
+      player.destroy();
+    });
+    this.otherPlayers = {};
+
+    // Remove all socket listeners
+    this.socket.off("player-died");
+    this.socket.off("playerPositionUpdate");
+    this.socket.off("player-shoot");
+    // Add other event listeners you need to remove
+  }
+
   createRemotePlayer(data) {
+    if (!this.scene || !this.scene.isActive()) return null;
     let remotePlayer;
 
     // Create the appropriate character based on their selected model
@@ -380,10 +441,101 @@ export default class GameScene extends Phaser.Scene {
     // add remote player to group for collisions with projectile
     this.otherPlayersGroup.add(remotePlayer);
 
+    // Add to allPlayers group
+    if (this.allPlayers) {
+      this.allPlayers.add(remotePlayer);
+    }
+
     return remotePlayer;
   }
 
-  update() {
+  setupEnemies() {
+    // Create the enemies manager
+    this.enemiesManager = new MultiplayerEnemiesManager(
+      this,
+      this.socket,
+      this.roomCode
+    );
+
+    // If this client is the host, spawn some initial enemies
+    if (this.isHost) {
+      this.spawnInitialEnemies();
+
+      // Set up a timer to spawn new enemies periodically
+      this.time.addEvent({
+        delay: 20000, // 20 seconds
+        callback: this.spawnPeriodicEnemy,
+        callbackScope: this,
+        loop: true,
+      });
+    }
+    // Create a group for all players (local and remote)
+    this.allPlayers = this.add.group();
+    this.allPlayers.add(this.player);
+
+    // Add remote players to the group
+    Object.values(this.otherPlayers).forEach((player) => {
+      this.allPlayers.add(player);
+    });
+
+    // Set up collisions between players and enemies
+    this.enemiesManager.setupCollisions(this.allPlayers);
+  }
+
+  spawnInitialEnemies() {
+    // Spawn a few enemies around the map
+    const spawnPoints = [
+      { x: 200, y: 200 },
+      { x: 800, y: 200 },
+      { x: 800, y: 600 },
+      { x: 200, y: 600 },
+      { x: 500, y: 400 },
+    ];
+
+    spawnPoints.forEach((point) => {
+      this.enemiesManager.spawnEnemy(point.x, point.y, "enemy");
+    });
+  }
+
+  spawnPeriodicEnemy() {
+    if (!this.isHost) return;
+
+    // Choose a random spawn point at the edge of the current camera view
+    const camera = this.cameras.main;
+    const spawnSide = Phaser.Math.Between(0, 3); // 0: top, 1: right, 2: bottom, 3: left
+
+    let x, y;
+    const padding = 50; // Distance outside the view
+    const cameraWidth = camera.width;
+    const cameraHeight = camera.height;
+
+    switch (spawnSide) {
+      case 0: // top
+        x = camera.scrollX + Phaser.Math.Between(0, cameraWidth);
+        y = camera.scrollY - padding;
+        break;
+      case 1: // right
+        x = camera.scrollX + cameraWidth + padding;
+        y = camera.scrollY + Phaser.Math.Between(0, cameraHeight);
+        break;
+      case 2: // bottom
+        x = camera.scrollX + Phaser.Math.Between(0, cameraWidth);
+        y = camera.scrollY + cameraHeight + padding;
+        break;
+      case 3: // left
+        x = camera.scrollX - padding;
+        y = camera.scrollY + Phaser.Math.Between(0, cameraHeight);
+        break;
+    }
+
+    // Spawn the enemy
+    this.enemiesManager.spawnEnemy(x, y, "enemy");
+  }
+
+  update(time, delta) {
+    if (!this.player || !this.player.active || !this.player.body) {
+      return;
+    }
     if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
       this.shootProjectile();
     }
@@ -403,14 +555,6 @@ export default class GameScene extends Phaser.Scene {
       if (x !== 0 || y !== 0) {
         this.player.facing = { x, y };
       }
-      
-
-      // Flip sprite hvis man går til venstre
-      /* if (x < 0) {
-        this.player.setFlipX(true);
-      } else if (x > 0) {
-        this.player.setFlipX(false);
-      } */
 
       // Testing damage when "1" is pressed
       if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
@@ -431,6 +575,10 @@ export default class GameScene extends Phaser.Scene {
         }
       }
 
+      if (this.enemiesManager) {
+        this.enemiesManager.update(time, delta);
+      }
+
       const playerTile = this.walkthrough.worldToTileXY(
         this.player.x,
         this.player.y
@@ -447,16 +595,20 @@ export default class GameScene extends Phaser.Scene {
         this.player.x !== this.previousX ||
         this.player.y !== this.previousY
       ) {
-        this.socket.emit("playerPosition", {
-          roomCode: this.roomCode,
-          playerId: this.socket.id,
-          playerName: this.playerName,
-          x: this.player.x,
-          y: this.player.y,
-          animation: this.player.anims.currentAnim?.key || startAnimation,
-          spriteModel: this.character,
-          playerHP: this.player.playerHP,
-        });
+        if (this.player && this.player.anims && this.player.active) {
+          const currentAnim =
+            this.player.anims.currentAnim?.key || "idlePlayerM"; // Default fallback
+          this.socket.emit("playerPosition", {
+            roomCode: this.roomCode,
+            playerId: this.socket.id,
+            playerName: this.playerName,
+            x: this.player.x,
+            y: this.player.y,
+            animation: this.player.anims.currentAnim?.key || startAnimation,
+            spriteModel: this.character,
+            playerHP: this.player.playerHP,
+          });
+        }
 
         // Update the previous position
         this.previousX = this.player.x;
