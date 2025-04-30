@@ -159,7 +159,7 @@ io.on("connection", (socket) => {
     console.log(activeRooms[roomCode].players);
 
     // Check if all players are ready
-    if (room.players.length > 1 && room.players.every((p) => p.ready)) {
+    if (room.players.length && room.players.every((p) => p.ready)) {
       io.to(roomCode).emit("all-players-ready");
     }
   });

@@ -30,6 +30,8 @@ export default class GameScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+
+    this.load.image("medkit", "assets/healing/medkit.png");
   }
 
   create() {
@@ -103,31 +105,63 @@ export default class GameScene extends Phaser.Scene {
       shoot: Phaser.Input.Keyboard.KeyCodes.K
     });
 
-    //medkit
-    this.medkit = this.physics.add.image(200, 200, 'medkit');
-    this.medkit.setScale(0.1);
+    const randomX = Phaser.Math.Between(100, 4900);
+    const randomY = Phaser.Math.Between(100, 4900);
 
-    this.medkit.body.setAllowGravity(false);
-
-    //medkit collision 
-    this.physics.add.overlap(
-      this.player,
-      this.medkit,
-      this.pickupMedkit,
-      null,
-      this
-    );
+    //------------------ Medkit random -------------------//
+    this.medkits = this.physics.add.group();
+    this.spawnMedkits(10);
+    this.physics.add.overlap(this.player, this.medkits, this.collectMedkit, null, this);
   }
 
-  //medkitpickup 
-  pickupMedkit(player, medkit) {
-    if (player.health < 100) {
-      player.health = Math.min(player.health + 20, 100);
-      medkit.destroy();
-      console.log("healed! current Hp:", player.health);
+  spawnMedkits(count) {
+    const minDistance = 100;
+
+    for (let i = 0; i < count; i++) {
+      let x, y;
+      let isValidPosition = false;
+
+      while (!isValidPosition) {
+        x = Phaser.Math.Between(50, 1150);
+        y = Phaser.Math.Between(50, 700)
+
+        isValidPosition = true;
+        this.medkits.getChildren().forEach((existingMedkit) => {
+          const distance = Phaser.Math.Distance.Between(x, y, existingMedkit.x, existingMedkit.y);
+        if (distance < minDistance){
+          isValidPosition = false;
+        }
+        });
+      }
+
+      const medkit = this.medkits.create(x, y, 'medkit');
+      medkit.setScale(0.1);
+      medkit.setGravity(0,0);
+      medkit.body.setCollideWorldBounds(true);
+      medkit.body.setImmovable(true);
+      medkit.setVisible(true);
     }
   }
+  
+  collectMedkit(player, medkit) {
+  if (player.playerHP < 100) {
+    player.heal(30);
+    console.log(`Healed ${healAmount} HP. Current HP: ${player.playerHP}`);
+    medkit.destroy();
+    
+    // Respawn a new medkit after delay
+    this.time.delayedCall(20000, () => {
+      const x = Phaser.Math.Between(100, 4900);
+      const y = Phaser.Math.Between(100, 4900);
+      
+      const newMedkit = this.medkits.create(x, y, 'medkit');
+      newMedkit.setScale(0.1);
+      newMedkit.body.setAllowGravity(false);
+      newMedkit.body.enable = true;
+    });
+  }
 
+}
   
 
   shootProjectile() {
