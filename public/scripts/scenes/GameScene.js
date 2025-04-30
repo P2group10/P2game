@@ -148,47 +148,69 @@ export default class GameScene extends Phaser.Scene {
 
   // shoot function
   shootProjectile() {
-    const bullet = this.projectiles.create(
-      this.player.x,
-      this.player.y,
-      "bullet"
-    );
-    bullet.setScale(0.1);
-    bullet.setCollideWorldBounds(true);
-    bullet.body.onWorldBounds = true;
+  // Sætter standard retning til den retning spilleren kigger
+  let facingX = this.player.facing.x;
+  let facingY = this.player.facing.y;
 
-    bullet.shooterId = this.socket.id;
+  // Overskirver retningen hvis der er trykket på en af piletasterne
+  if (this.cursors.up.isDown) {
+    facingX = 0;
+    facingY = -1;
+  } else if (this.cursors.down.isDown) {
+    facingX = 0;
+    facingY = 1;
+  } else if (this.cursors.left.isDown) {
+    facingX = -1;
+    facingY = 0;
+  } else if (this.cursors.right.isDown) {
+    facingX = 1;
+    facingY = 0;
+  }
+
+  // normaliser retningen for at sikre at hastigheden er ens uanset retning
+  const direction = new Phaser.Math.Vector2(facingX, facingY).normalize();
+  const defaultFacing = new Phaser.Math.Vector2(this.player.facing.x, this.player.facing.y).normalize();
+
+  // Opretter en ny bullet og sætter bulletens position til spillerens position
+  const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
+  bullet.setScale(0.1);
+  bullet.setCollideWorldBounds(true);
+  bullet.body.onWorldBounds = true;
+
+  bullet.shooterId = this.socket.id;
+
+// Sætter bulletens hastighed
 
     const speed = 400;
-    const { x: facingX, y: facingY } = this.player.facing;
-
-    const velocityX = facingX * speed;
-    const velocityY = facingY * speed;
-
+    const velocityX = direction.x * speed;
+    const velocityY = direction.y * speed;
+  
     bullet.setVelocity(velocityX, velocityY);
 
-    // Beregn vinkel (i grader) og sæt rotation
-    const angleRad = Math.atan2(facingY, facingX); // radians
-    const angleDeg = Phaser.Math.RadToDeg(angleRad); // konverter til grader
-    bullet.setAngle(angleDeg);
+  // Udregner bulletens retning og vinkel
+  const angleRad = Math.atan2(direction.y, direction.x); // radians
+  const angleDeg = Phaser.Math.RadToDeg(angleRad); // convert to degrees
+  bullet.setAngle(angleDeg);
 
-    this.time.delayedCall(1000, () => {
-      bullet.destroy();
-    });
+  // Ødelægger bulleten efter 1 sekund
+  this.time.delayedCall(1000, () => {
+    bullet.destroy();
+  });
 
-    this.socket.emit("shoot", {
-      roomCode: this.roomCode,
-      x: this.player.x,
-      y: this.player.y,
-      velocityX: velocityX,
-      velocityY: velocityY,
-      angle: angleDeg,
-      speed: speed,
-      facingX: facingX,
-      facingY: facingY,
-      playerId: this.socket.id,
-    });
-  }
+  // Sender bulletens data til serveren
+  this.socket.emit("shoot", {
+    roomCode: this.roomCode,
+    x: this.player.x,
+    y: this.player.y,
+    velocityX: velocityX,
+    velocityY: velocityY,
+    angle: angleDeg,
+    speed: speed,
+    facingX: direction.x,
+    facingY: direction.y,
+    playerId: this.socket.id,
+  });
+}
 
   createLocalPlayer() {
     let startX = 400;

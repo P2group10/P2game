@@ -37,46 +37,42 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
       // Movement logic
       if (cursors.shift.isDown) {
         if (
-          (cursors.a.isDown && cursors.w.isDown) ||
-          (cursors.left.isDown && cursors.up.isDown)
+          (cursors.a.isDown && cursors.w.isDown) 
         ) {
           this.setVelocity(-sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpPlayerM", true);
           this.animation = "sprintUpPlayerM";
         } else if (
-          (cursors.a.isDown && cursors.s.isDown) ||
-          (cursors.left.isDown && cursors.down.isDown)
+          (cursors.a.isDown && cursors.s.isDown) 
         ) {
           this.setVelocity(-sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownPlayerM", true);
           this.animation = "sprintDownPlayerM";
         } else if (
-          (cursors.d.isDown && cursors.w.isDown) ||
-          (cursors.right.isDown && cursors.up.isDown)
+          (cursors.d.isDown && cursors.w.isDown) 
         ) {
           this.setVelocity(sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpPlayerM", true);
           this.animation = "sprintUpPlayerM";
         } else if (
-          (cursors.d.isDown && cursors.s.isDown) ||
-          (cursors.right.isDown && cursors.down.isDown)
+          (cursors.d.isDown && cursors.s.isDown)
         ) {
           this.setVelocity(sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownPlayerM", true);
           this.animation = "sprintDownPlayerM";
-        } else if (cursors.a.isDown || cursors.left.isDown) {
+        } else if (cursors.a.isDown ) {
           this.setVelocityX(-sprintVelocit);
           this.anims.play("sprintLeftPlayerM", true);
           this.animation = "sprintLeftPlayerM";
-        } else if (cursors.d.isDown || cursors.right.isDown) {
+        } else if (cursors.d.isDown) {
           this.setVelocityX(sprintVelocit);
           this.anims.play("sprintRightPlayerM", true);
           this.animation = "sprintRightPlayerM";
-        } else if (cursors.w.isDown || cursors.up.isDown) {
+        } else if (cursors.w.isDown ) {
           this.setVelocityY(-sprintVelocit);
           this.anims.play("sprintUpPlayerM", true);
           this.animation = "sprintUpPlayerM";
-        } else if (cursors.s.isDown || cursors.down.isDown) {
+        } else if (cursors.s.isDown ) {
           this.setVelocityY(sprintVelocit);
           this.anims.play("sprintDownPlayerM", true);
           this.animation = "sprintDownPlayerM";
@@ -84,32 +80,28 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
       }
       // Walk movement
       else if (
-        (cursors.a.isDown && cursors.w.isDown) ||
-        (cursors.left.isDown && cursors.up.isDown)
+        (cursors.a.isDown && cursors.w.isDown)
       ) {
         this.setVelocity(-velocity, -velocity);
         this.flipX = true;
         this.anims.play("walkUpPlayerM", true);
         this.animation = "walkUpPlayerM";
       } else if (
-        (cursors.a.isDown && cursors.s.isDown) ||
-        (cursors.left.isDown && cursors.down.isDown)
+        (cursors.a.isDown && cursors.s.isDown) 
       ) {
         this.setVelocity(-velocity, velocity);
         this.flipX = true;
         this.anims.play("walkDownPlayerM", true);
         this.animation = "walkDownPlayerM";
       } else if (
-        (cursors.d.isDown && cursors.w.isDown) ||
-        (cursors.right.isDown && cursors.up.isDown)
+        (cursors.d.isDown && cursors.w.isDown)
       ) {
         this.setVelocity(velocity, -velocity);
         this.flipX = false;
         this.anims.play("walkUpPlayerM", true);
         this.animation = "walkUpPlayerM";
       } else if (
-        (cursors.d.isDown && cursors.s.isDown) ||
-        (cursors.right.isDown && cursors.down.isDown)
+        (cursors.d.isDown && cursors.s.isDown) 
       ) {
         this.setVelocity(velocity, velocity);
         this.flipX = false;
@@ -117,20 +109,20 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         this.animation = "walkDownPlayerM";
       }
       // Straight walk
-      else if (cursors.a.isDown || cursors.left.isDown) {
+      else if (cursors.a.isDown) {
         this.setVelocityX(-velocity);
         this.anims.play("walkLeftPlayerM", true);
         this.animation = "walkLeftPlayerM";
-      } else if (cursors.d.isDown || cursors.right.isDown) {
+      } else if (cursors.d.isDown ) {
         this.setVelocityX(velocity);
         this.flipX = false;
         this.anims.play("walkRightPlayerM", true);
         this.animation = "walkRightPlayerM";
-      } else if (cursors.w.isDown || cursors.up.isDown) {
+      } else if (cursors.w.isDown ) {
         this.setVelocityY(-velocity);
         this.anims.play("walkUpPlayerM", true);
         this.animation = "walkUpPlayerM";
-      } else if (cursors.s.isDown || cursors.down.isDown) {
+      } else if (cursors.s.isDown ) {
         this.setVelocityY(velocity);
         this.anims.play("walkDownPlayerM", true);
         this.animation = "walkDownPlayerM";
@@ -144,8 +136,6 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
 
       // **Fix: Explicitly stop movement when keys are released**
       if (
-        !cursors.left.isDown &&
-        !cursors.right.isDown &&
         !cursors.a.isDown &&
         !cursors.d.isDown
       ) {
@@ -153,8 +143,6 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
       }
 
       if (
-        !cursors.up.isDown &&
-        !cursors.down.isDown &&
         !cursors.w.isDown &&
         !cursors.s.isDown
       ) {
