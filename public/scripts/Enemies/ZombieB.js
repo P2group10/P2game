@@ -118,6 +118,10 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
 
     // Check if zombieB is dead
     if (this.hp <= 0) {
+      if (this.healthBarContainer) {
+        this.healthBarContainer.destroy();
+      }
+  
       // If we have a multiplayer manager and this zombieB has an ID
       if (this.scene.enemiesManager && this.id) {
         this.scene.enemiesManager.killEnemy(this.id);
