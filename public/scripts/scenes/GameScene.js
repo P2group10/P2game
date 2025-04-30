@@ -40,7 +40,8 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.hud = new HUD(this);
-
+    this.lastFired = 0; // Initialize the cooldown timer
+  
     // Create map layers
     const map = this.make.tilemap({ key: "trialMap" });
     const tileset = map.addTilesetImage("open_tileset", "open_tileset");
@@ -50,7 +51,6 @@ export default class GameScene extends Phaser.Scene {
     const sidewalksLayer = map.createLayer("sidewalks", tileset, 0, 0);
     const buildingLayer = map.createLayer("building", tileset, 0, 0);
     const boxLayer = map.createLayer("boxes", tileset, 0, 0);
-    const fencesLayer = map.createLayer("fences", tileset, 0, 0);
 
     // Group for projectiles and other players. Group is used so we can use physics such as overlaps
     this.projectiles = this.physics.add.group();
@@ -59,7 +59,6 @@ export default class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
-    fencesLayer.setCollisionByExclusion([-1]);
     buildingLayer.setCollisionByExclusion([-1]);
     boxLayer.setCollisionByExclusion([-1]);
     treea01Layer.setCollisionByExclusion([-1]);
@@ -92,7 +91,6 @@ export default class GameScene extends Phaser.Scene {
     this.previousX = this.player.x;
     this.previousY = this.player.y;
 
-    this.physics.add.collider(this.player, fencesLayer);
     this.physics.add.collider(this.player, buildingLayer);
     this.physics.add.collider(this.player, boxLayer);
     this.physics.add.collider(this.player, treea01Layer);
@@ -104,14 +102,10 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.projectiles, treea01Layer, (bullet) => {
       bullet.destroy();
     });
-    this.physics.add.collider(this.projectiles, fencesLayer, (bullet) => {
-      bullet.destroy();
-    });
     this.physics.add.collider(this.projectiles, boxLayer, (bullet) => {
       bullet.destroy();
     });
 
-    this.physics.add.collider(this.enemiesManager.enemiesGroup, fencesLayer);
     this.physics.add.collider(this.enemiesManager.enemiesGroup, buildingLayer);
     this.physics.add.collider(this.enemiesManager.enemiesGroup, boxLayer);
     this.physics.add.collider(this.enemiesManager.enemiesGroup, treea01Layer);
@@ -166,6 +160,20 @@ export default class GameScene extends Phaser.Scene {
     facingX = 1;
     facingY = 0;
   }
+  if (this.cursors.up.isDown && this.cursors.left.isDown) {
+    facingX = -1;
+    facingY = -1;
+  } else if (this.cursors.up.isDown && this.cursors.right.isDown) {
+    facingX = 1;
+    facingY = -1;
+  } else if (this.cursors.down.isDown && this.cursors.left.isDown) {
+    facingX = -1;
+    facingY = 1;
+  } else if (this.cursors.down.isDown && this.cursors.right.isDown) {
+    facingX = 1;
+    facingY = 1;
+  }
+
 
   // normaliser retningen for at sikre at hastigheden er ens uanset retning
   const direction = new Phaser.Math.Vector2(facingX, facingY).normalize();
@@ -558,9 +566,37 @@ export default class GameScene extends Phaser.Scene {
     if (!this.player || !this.player.active || !this.player.body) {
       return;
     }
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
-      this.shootProjectile();
+    const fireRate = 250; // Cooldown in milliseconds (e.g., 500ms = 0.5 seconds)
+
+
+    if (time > this.lastFired + fireRate) {
+      if (this.cursors.up.isDown && this.cursors.left.isDown) {
+        this.shootProjectile(-1, -1); // Fire diagonally upward-left
+        this.lastFired = time; // Update the cooldown timer
+      } else if (this.cursors.up.isDown && this.cursors.right.isDown) {
+        this.shootProjectile(1, -1); // Fire diagonally upward-right
+        this.lastFired = time;
+      } else if (this.cursors.down.isDown && this.cursors.left.isDown) {
+        this.shootProjectile(-1, 1); // Fire diagonally downward-left
+        this.lastFired = time;
+      } else if (this.cursors.down.isDown && this.cursors.right.isDown) {
+        this.shootProjectile(1, 1); // Fire diagonally downward-right
+        this.lastFired = time;
+      } else if (this.cursors.up.isDown) {
+        this.shootProjectile(0, -1); // Fire upward
+        this.lastFired = time;
+      } else if (this.cursors.down.isDown) {
+        this.shootProjectile(0, 1); // Fire downward
+        this.lastFired = time;
+      } else if (this.cursors.left.isDown) {
+        this.shootProjectile(-1, 0); // Fire left
+        this.lastFired = time;
+      } else if (this.cursors.right.isDown) {
+        this.shootProjectile(1, 0); // Fire right
+        this.lastFired = time;
+      }
     }
+    
 
     if (this.player) {
       this.player.update(this.cursors);
