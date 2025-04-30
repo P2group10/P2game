@@ -102,7 +102,33 @@ export default class GameScene extends Phaser.Scene {
       two: Phaser.Input.Keyboard.KeyCodes.TWO,
       shoot: Phaser.Input.Keyboard.KeyCodes.K
     });
+
+    //medkit
+    this.medkit = this.physics.add.image(200, 200, 'medkit');
+    this.medkit.setScale(0.1);
+
+    this.medkit.body.setAllowGravity(false);
+
+    //medkit collision 
+    this.physics.add.overlap(
+      this.player,
+      this.medkit,
+      this.pickupMedkit,
+      null,
+      this
+    );
   }
+
+  //medkitpickup 
+  pickupMedkit(player, medkit) {
+    if (player.health < 100) {
+      player.health = Math.min(player.health + 20, 100);
+      medkit.destroy();
+      console.log("healed! current Hp:", player.health);
+    }
+  }
+
+  
 
   shootProjectile() {
     const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
