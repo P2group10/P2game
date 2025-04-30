@@ -489,11 +489,9 @@ export default class GameScene extends Phaser.Scene {
 
     // If this client is the host, spawn some initial enemies
     if (this.isHost) {
-      this.spawnInitialEnemies();
-
       // Set up a timer to spawn new enemies periodically
       this.time.addEvent({
-        delay: 20000, // 20 seconds
+        delay: 1000, // 20 seconds
         callback: this.spawnPeriodicEnemy,
         callbackScope: this,
         loop: true,
@@ -512,20 +510,6 @@ export default class GameScene extends Phaser.Scene {
     this.enemiesManager.setupCollisions(this.allPlayers);
   }
 
-  spawnInitialEnemies() {
-    // Spawn a few enemies around the map
-    const spawnPoints = [
-      { x: 200, y: 200 },
-      { x: 800, y: 200 },
-      { x: 800, y: 600 },
-      { x: 200, y: 600 },
-      { x: 500, y: 400 },
-    ];
-
-    spawnPoints.forEach((point) => {
-      this.enemiesManager.spawnEnemy(point.x, point.y, "enemy");
-    });
-  }
 
   spawnPeriodicEnemy() {
     if (!this.isHost) return;
