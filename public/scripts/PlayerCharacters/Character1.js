@@ -33,7 +33,7 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
     if (!this.active || !this.body || !this.scene) return;
 
     let velocity = 160;
-    let sprintVelocit = 300;
+    let sprintVelocit = 10;
 
     const previousAnimation = this.animation;
     if (this.isLocalPlayer) {
