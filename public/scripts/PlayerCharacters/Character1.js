@@ -86,28 +86,24 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
         (cursors.a.isDown && cursors.w.isDown) 
       ) {
         this.setVelocity(-velocity, -velocity);
-        this.flipX = true;
         this.anims.play("walkUpTestPlayer", true);
         this.animation = "walkUpTestPlayer";
       } else if (
         (cursors.a.isDown && cursors.s.isDown) 
       ) {
         this.setVelocity(-velocity, velocity);
-        this.flipX = true;
         this.anims.play("walkDownTestPlayer", true);
         this.animation = "walkDownTestPlayer";
       } else if (
         (cursors.d.isDown && cursors.w.isDown) 
       ) {
         this.setVelocity(velocity, -velocity);
-        this.flipX = false;
         this.anims.play("walkUpTestPlayer", true);
         this.animation = "walkUpTestPlayer";
       } else if (
         (cursors.d.isDown && cursors.s.isDown)
       ) {
         this.setVelocity(velocity, velocity);
-        this.flipX = false;
         this.anims.play("walkDownTestPlayer", true);
         this.animation = "walkDownTestPlayer";
       }
@@ -118,7 +114,6 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
         this.animation = "walkLeftTestPlayer";
       } else if (cursors.d.isDown) {
         this.setVelocityX(velocity);
-        this.flipX = false;
         this.anims.play("walkRightTestPlayer", true);
         this.animation = "walkRightTestPlayer";
       } else if (cursors.w.isDown) {
