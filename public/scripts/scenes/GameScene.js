@@ -1,5 +1,7 @@
 import character1 from "/scripts/PlayerCharacters/Character1.js";
 import character2 from "/scripts/PlayerCharacters/Character2.js";
+import character3 from "/scripts/PlayerCharacters/Character3.js";
+import character4 from "/scripts/PlayerCharacters/Character4.js";
 import characterAnims from "../PlayerCharacters/CharacterAnims.js";
 import HUD from "/scripts/Hud/hud.js";
 import MultiplayerEnemiesManager from "/scripts/Enemies/enemyManager.js";
@@ -31,6 +33,19 @@ export default class GameScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+
+    this.load.spritesheet("Character3", "assets/Characters/Character3.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    
+    this.load.spritesheet("Player4", "assets/Characters/Player4.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+
+
+
 
     this.load.spritesheet("zombieB", "assets/zombies/zombieB.png", {
       frameWidth: 64,
@@ -238,6 +253,18 @@ export default class GameScene extends Phaser.Scene {
         startY = 240;
         playerHP = 200;
         break;
+      case "character3":
+        texture = "Character3";
+        startX = 400;
+        startY = 240;
+        playerHP = 200;
+        break;
+      case "character4":
+        texture = "Player4";
+        startX = 400;
+        startY = 240;
+        playerHP = 200;
+        break;
       default:
         texture = "TestPlayer";
         break;
@@ -253,8 +280,28 @@ export default class GameScene extends Phaser.Scene {
         this.socket, // socket
         this.hud // hud reference
       );
-    } else {
+    } else if (this.character === "character2") {
       this.player = new character2(
+        this, // scene
+        startX, // x
+        startY, // y
+        texture, // texture
+        playerHP, // playerHP
+        this.socket, // socket
+        this.hud // hud reference
+      );
+    } else if (this.character === "character3") {
+      this.player = new character3(
+        this, // scene
+        startX, // x
+        startY, // y
+        texture, // texture
+        playerHP, // playerHP
+        this.socket, // socket
+        this.hud // hud reference
+      );
+    } else {
+      this.player = new character4(
         this, // scene
         startX, // x
         startY, // y
@@ -310,6 +357,18 @@ export default class GameScene extends Phaser.Scene {
             } else if (data.spriteModel === "character2") {
               console.log(
                 "Creating remote player with character2:",
+                data.animation
+              );
+              otherPlayer.play(data.animation);
+            } else if (data.spriteModel === "character3") {
+              console.log(
+                "Creating remote player with character3:",
+                data.animation
+              );
+              otherPlayer.play(data.animation);
+            } else if (data.spriteModel === "character4") {
+              console.log(
+                "Creating remote player with character4:",
                 data.animation
               );
               otherPlayer.play(data.animation);
@@ -433,9 +492,15 @@ export default class GameScene extends Phaser.Scene {
     } else if (data.spriteModel === "character2") {
       remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
       startAnimation = "idlePlayerM";
+    } else if (data.spriteModel === "character3") {
+      remotePlayer = new character3(this, data.x, data.y, "Character3");
+      startAnimation = "idleCharacter3";
+    } else if (data.spriteModel === "character4") {
+      remotePlayer = new character4(this, data.x, data.y, "Player4");
+      startAnimation = "idlePlayer4";
     } else {
       // Default case
-      remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
+      remotePlayer = new character3(this, data.x, data.y, "Character3");
     }
 
     remotePlayer.isLocalPlayer = false;
@@ -465,6 +530,10 @@ export default class GameScene extends Phaser.Scene {
         remotePlayer.character1.play(data.animation);
       } else if (data.spriteModel === "character2") {
         remotePlayer.character2.play(data.animation);
+      } else if (data.spriteModel === "character3") {
+        remotePlayer.character3.play(data.animation);
+      } else if (data.spriteModel === "character4") {
+        remotePlayer.character4.play(data.animation);
       }
     }
 
