@@ -23,6 +23,14 @@ export default class CharacterSelectScene extends Phaser.Scene {
       "assets/Characters/SelectImages/Character2.png"
     );
     this.load.image(
+      "character3",
+      "assets/Characters/SelectImages/Character3.png"
+    );
+    this.load.image(
+      "character4",
+      "assets/Characters/SelectImages/Character4.png"
+    );
+    this.load.image(
       "BackGroundImageStart",
       "assets/images/backgroundStart.jpeg"
     );
@@ -63,11 +71,26 @@ export default class CharacterSelectScene extends Phaser.Scene {
       .image(centerX, centerY - 100, "character2")
       .setInteractive()
       .setScale(0.5);
+    
+    this.character3 = this.add
+      .image(centerX + 150, centerY - 100, "character3")
+      .setInteractive()
+      .setScale(0.13);
+    
+    this.character4 = this.add
+      .image(centerX + 150, centerY + 100, "character4")
+      .setInteractive()
+      .setScale(0.37);
+    
     this.character1.on("pointerover", () => this.character1.setScale(0.6));
     this.character2.on("pointerover", () => this.character2.setScale(0.6));
+    this.character3.on("pointerover", () => this.character3.setScale(0.2));
+    this.character4.on("pointerover", () => this.character4.setScale(0.4));
 
     this.character1.on("pointerout", () => this.character1.setScale(0.5));
     this.character2.on("pointerout", () => this.character2.setScale(0.5));
+    this.character3.on("pointerout", () => this.character3.setScale(0.13));
+    this.character4.on("pointerout", () => this.character4.setScale(0.37));
 
     this.character1.on("pointerdown", () => {
       console.log(`Character 1. selected`);
@@ -78,6 +101,18 @@ export default class CharacterSelectScene extends Phaser.Scene {
     this.character2.on("pointerdown", () => {
       console.log(`Character 2. selected`);
       this.selectCharacter("character2");
+      this.updatePlayerList();
+    });
+
+    this.character3.on("pointerdown", () => {
+      console.log(`Character 3. selected`);
+      this.selectCharacter("character3");
+      this.updatePlayerList();
+    });
+
+    this.character4.on("pointerdown", () => {
+      console.log(`Character 4. selected`);
+      this.selectCharacter("character4");
       this.updatePlayerList();
     });
 
@@ -140,6 +175,8 @@ export default class CharacterSelectScene extends Phaser.Scene {
     // Highlight the selected character
     this.character1.setTint(characterId === "character1" ? 0x00ff00 : 0xffffff);
     this.character2.setTint(characterId === "character2" ? 0x00ff00 : 0xffffff);
+    this.character3.setTint(characterId === "character3" ? 0x00ff00 : 0xffffff);
+    this.character4.setTint(characterId === "character4" ? 0x00ff00 : 0xffffff);
     this.updatePlayerList();
   }
 
