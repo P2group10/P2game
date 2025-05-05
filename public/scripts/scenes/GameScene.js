@@ -678,6 +678,7 @@ export default class GameScene extends Phaser.Scene {
         this.player.heal(10); // Increase health by 10
       }
 
+      // Update other players' name text positions
       for (const playerId in this.otherPlayers) {
         const player = this.otherPlayers[playerId];
         if (player.nameText) {
@@ -686,6 +687,7 @@ export default class GameScene extends Phaser.Scene {
         }
       }
 
+      // Always update the enemies manager, regardless of host status
       if (this.enemiesManager) {
         this.enemiesManager.update(time, delta);
       }

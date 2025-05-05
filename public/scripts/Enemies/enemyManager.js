@@ -35,6 +35,10 @@ export default class MultiplayerEnemiesManager {
       if (enemy) {
         enemy.x = data.x;
         enemy.y = data.y;
+        // Update health bar position after updating enemy position
+        if (enemy.updateHealthBar) {
+          enemy.updateHealthBar();
+        }
         if (data.animation) {
           enemy.play(data.animation, true);
         }
@@ -45,6 +49,10 @@ export default class MultiplayerEnemiesManager {
     this.socket.on('enemy-killed', (data) => {
       const enemy = this.enemies[data.enemyId];
       if (enemy) {
+        // Clean up health bar before destroying the enemy
+        if (enemy.healthBarContainer) {
+          enemy.healthBarContainer.destroy();
+        }
         enemy.destroy();
         delete this.enemies[data.enemyId];
       }
@@ -96,6 +104,13 @@ export default class MultiplayerEnemiesManager {
           animation: enemy.anims.currentAnim?.key
         });
       });
+    } else {
+      // For non-hosts, make sure health bars follow enemies
+      Object.values(this.enemies).forEach(enemy => {
+        if (enemy.updateHealthBar) {
+          enemy.updateHealthBar();
+        }
+      });
     }
   }
   
@@ -104,7 +119,7 @@ export default class MultiplayerEnemiesManager {
     const enemiesArray = Object.values(this.enemies);
     this.scene.physics.add.collider(this.enemiesGroup, players, this.handleEnemyCollision.bind(this));
     this.scene.physics.add.collider(this.enemiesGroup, this.enemiesGroup);
-}
+  }
   
   handleEnemyCollision(player) {
     // Enhanced safety checks
@@ -128,7 +143,7 @@ export default class MultiplayerEnemiesManager {
             });
         }
     }
-}
+  }
   
   killEnemy(enemyId) {
     if (this.isHost) {
@@ -141,6 +156,10 @@ export default class MultiplayerEnemiesManager {
       // Destroy the enemy
       const enemy = this.enemies[enemyId];
       if (enemy) {
+        // Clean up health bar before destroying
+        if (enemy.healthBarContainer) {
+          enemy.healthBarContainer.destroy();
+        }
         enemy.destroy();
         delete this.enemies[enemyId];
       }
