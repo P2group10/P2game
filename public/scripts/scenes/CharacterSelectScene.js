@@ -75,22 +75,22 @@ export default class CharacterSelectScene extends Phaser.Scene {
     this.character3 = this.add
       .image(centerX + 150, centerY - 100, "character3")
       .setInteractive()
-      .setScale(0.13);
+      .setScale(0.5);
     
     this.character4 = this.add
       .image(centerX + 150, centerY + 100, "character4")
       .setInteractive()
-      .setScale(0.37);
+      .setScale(0.5);
     
     this.character1.on("pointerover", () => this.character1.setScale(0.6));
     this.character2.on("pointerover", () => this.character2.setScale(0.6));
-    this.character3.on("pointerover", () => this.character3.setScale(0.2));
-    this.character4.on("pointerover", () => this.character4.setScale(0.4));
+    this.character3.on("pointerover", () => this.character3.setScale(0.6));
+    this.character4.on("pointerover", () => this.character4.setScale(0.6));
 
     this.character1.on("pointerout", () => this.character1.setScale(0.5));
     this.character2.on("pointerout", () => this.character2.setScale(0.5));
-    this.character3.on("pointerout", () => this.character3.setScale(0.13));
-    this.character4.on("pointerout", () => this.character4.setScale(0.37));
+    this.character3.on("pointerout", () => this.character3.setScale(0.5));
+    this.character4.on("pointerout", () => this.character4.setScale(0.5));
 
     this.character1.on("pointerdown", () => {
       console.log(`Character 1. selected`);
