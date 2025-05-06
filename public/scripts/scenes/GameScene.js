@@ -63,9 +63,10 @@ export default class GameScene extends Phaser.Scene {
     const groundLayer = map.createLayer("ground", tileset, 0, 0);
     const treea01Layer = map.createLayer("trees 01", tileset, 0, 0);
     const streetsLayer = map.createLayer("streets", tileset, 0, 0);
-    const sidewalksLayer = map.createLayer("sidewalks", tileset, 0, 0);
     const buildingLayer = map.createLayer("building", tileset, 0, 0);
-    const boxLayer = map.createLayer("boxes", tileset, 0, 0);
+    const boxLayer = map.createLayer("Boxes", tileset, 0, 0);
+    const ParkLayer = map.createLayer("Park", tileset, 0, 0);
+    const VandLayer = map.createLayer("Vand", tileset, 0, 0);
 
     // Group for projectiles and other players. Group is used so we can use physics such as overlaps
     this.projectiles = this.physics.add.group();
@@ -77,6 +78,7 @@ export default class GameScene extends Phaser.Scene {
     buildingLayer.setCollisionByExclusion([-1]);
     boxLayer.setCollisionByExclusion([-1]);
     treea01Layer.setCollisionByExclusion([-1]);
+    VandLayer.setCollisionByExclusion([-1]);
 
     // Create local player based on selected character
     this.createLocalPlayer();
@@ -109,6 +111,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, buildingLayer);
     this.physics.add.collider(this.player, boxLayer);
     this.physics.add.collider(this.player, treea01Layer);
+    this.physics.add.collider(this.player, VandLayer);
 
     // bullet collisions for buildings and trees
     this.physics.add.collider(this.projectiles, buildingLayer, (bullet) => {
@@ -124,6 +127,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemiesManager.enemiesGroup, buildingLayer);
     this.physics.add.collider(this.enemiesManager.enemiesGroup, boxLayer);
     this.physics.add.collider(this.enemiesManager.enemiesGroup, treea01Layer);
+    this.physics.add.collider(this.enemiesManager.enemiesGroup, VandLayer);
 
     this.physics.add.overlap(
       this.projectiles,
