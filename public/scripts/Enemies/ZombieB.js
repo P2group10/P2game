@@ -201,7 +201,7 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    if (minDistance < chaseDistance && closestPlayer) {
+    if (minDistance < chaseDistance) {
       this.scene.physics.moveToObject(this, closestPlayer, 150);
       const angle = Phaser.Math.Angle.Between(
         this.x,
