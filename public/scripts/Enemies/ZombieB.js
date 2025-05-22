@@ -15,22 +15,18 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
     this.createAnimations(scene);
     this.body.setCircle(16, 16, 16);
     this.setScale(0.5);
-    // Add health and damage properties
+
     this.hp = 100;
     this.maxHp = 100;
     this.attackDamage = 1;
-    this.attackCooldown = 10000; // 1 second between attacks
+    this.attackCooldown = 1000;
     this.lastAttackTime = 0;
 
-    // Add health bar
     this.createHealthBar();
-    
-    // Set up listeners for position changes
     this.on('destroy', this.onDestroy, this);
   }
 
   onDestroy() {
-    // Clean up health bar when zombie is destroyed
     if (this.healthBarContainer) {
       this.healthBarContainer.destroy();
       this.healthBarContainer = null;
@@ -38,7 +34,6 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
   }
 
   createHealthBar() {
-    // Create health bar container
     this.healthBarContainer = this.scene.add.graphics();
     this.updateHealthBar();
   }
@@ -46,17 +41,12 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
   updateHealthBar() {
     if (!this.healthBarContainer || !this.scene) return;
 
-    // Clear previous graphics
     this.healthBarContainer.clear();
-
-    // Calculate health percentage
     const healthPercentage = this.hp / this.maxHp;
 
-    // Draw background (red)
     this.healthBarContainer.fillStyle(0xff0000);
     this.healthBarContainer.fillRect(this.x - 15, this.y - 25, 30, 4);
 
-    // Draw health (green)
     this.healthBarContainer.fillStyle(0x00ff00);
     this.healthBarContainer.fillRect(
       this.x - 15,
@@ -78,65 +68,53 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
     if (!scene.anims.exists('zIdle')) {
       scene.anims.create({
         key: "zIdle",
-        frames: scene.anims.generateFrameNumbers("zombieB", {
-          start: 143,
-          end: 151,
-        }),
+        frames: scene.anims.generateFrameNumbers("zombieB", { start: 143, end: 151 }),
         frameRate: 10,
       });
       scene.anims.create({
         key: "zRunRight",
-        frames: scene.anims.generateFrameNumbers("zombieB", {
-          start: 144,
-          end: 151,
-        }),
+        frames: scene.anims.generateFrameNumbers("zombieB", { start: 144, end: 151 }),
         frameRate: 20,
       });
       scene.anims.create({
         key: "zRunUp",
-        frames: scene.anims.generateFrameNumbers("zombieB", {
-          start: 105,
-          end: 112,
-        }),
+        frames: scene.anims.generateFrameNumbers("zombieB", { start: 105, end: 112 }),
         frameRate: 20,
       });
       scene.anims.create({
         key: "zRunDown",
-        frames: scene.anims.generateFrameNumbers("zombieB", {
-          start: 131,
-          end: 138,
-        }),
+        frames: scene.anims.generateFrameNumbers("zombieB", { start: 131, end: 138 }),
         frameRate: 20,
       });
       scene.anims.create({
         key: "zRunLeft",
-        frames: scene.anims.generateFrameNumbers("zombieB", {
-          start: 118,
-          end: 125,
-        }),
+        frames: scene.anims.generateFrameNumbers("zombieB", { start: 118, end: 125 }),
         frameRate: 20,
       });
     }
   }
 
-  takeDamage(amount) {
+  takeDamage(amount, killerId) {
     this.hp -= amount;
     this.updateHealthBar();
 
-    // Flash red when damaged
     this.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => {
-      this.clearTint();
-    });
+    this.scene.time.delayedCall(100, () => this.clearTint());
 
-    // Check if zombieB is dead
     if (this.hp <= 0) {
       if (this.healthBarContainer) {
         this.healthBarContainer.destroy();
         this.healthBarContainer = null;
       }
-  
-      // If we have a multiplayer manager and this zombieB has an ID
+
+      // ✅ Giv score til den spiller, som faktisk dræbte zombien
+      if (killerId === this.scene.socket?.id) {
+        if (this.scene.score !== undefined) {
+          this.scene.score += 1;
+          this.scene.hud.updateScore(this.scene.score);
+        }
+      }
+
       if (this.scene.enemiesManager && this.id) {
         this.scene.enemiesManager.killEnemy(this.id);
       } else {
@@ -146,23 +124,19 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
   }
 
   attackPlayer(player) {
-    // Only damage if the player has the takeDamage method
     if (player && typeof player.takeDamage === 'function') {
       player.takeDamage(this.attackDamage);
     }
   }
 
   update(time) {
-    // Update health bar position - this ensures it stays with the zombie
     this.updateHealthBar();
 
-    // Get all players (local and remote)
     const allPlayers = [];
     if (this.scene.player && this.scene.player.active) {
       allPlayers.push(this.scene.player);
     }
-    
-    // Check if otherPlayers exists before trying to iterate over it
+
     if (this.scene.otherPlayers) {
       Object.values(this.scene.otherPlayers).forEach((player) => {
         if (player && player.active) {
@@ -176,18 +150,11 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
       return;
     }
 
-    // Find the closest player
     let closestPlayer = null;
     let minDistance = Infinity;
 
     for (const player of allPlayers) {
-      const distance = Phaser.Math.Distance.Between(
-        this.x,
-        this.y,
-        player.x,
-        player.y
-      );
-
+      const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
       if (distance < minDistance) {
         minDistance = distance;
         closestPlayer = player;
@@ -203,12 +170,7 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
 
     if (minDistance < chaseDistance) {
       this.scene.physics.moveToObject(this, closestPlayer, 150);
-      const angle = Phaser.Math.Angle.Between(
-        this.x,
-        this.y,
-        closestPlayer.x,
-        closestPlayer.y
-      );
+      const angle = Phaser.Math.Angle.Between(this.x, this.y, closestPlayer.x, closestPlayer.y);
       if (angle >= -0.8 && angle <= 0.8) {
         this.anims.play("zRunRight", true);
       } else if (angle < 2.2 && angle > 0.8) {
@@ -221,11 +183,7 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
         this.anims.play("zRunUp", true);
       }
 
-      // Check for attack
-      if (
-        minDistance < 50 &&
-        time > this.lastAttackTime + this.attackCooldown
-      ) {
+      if (minDistance < 50 && time > this.lastAttackTime + this.attackCooldown) {
         this.attackPlayer(closestPlayer);
         this.lastAttackTime = time;
       }
@@ -235,11 +193,7 @@ export default class zombieB extends Phaser.Physics.Arcade.Sprite {
         this.currentTarget = this.getRandomPointInRadius();
         this.wanderTimer = this.wanderInterval;
       } else {
-        this.scene.physics.moveToObject(
-          this,
-          this.currentTarget,
-          this.wanderSpeed
-        );
+        this.scene.physics.moveToObject(this, this.currentTarget, this.wanderSpeed);
         const distanceToTarget = Phaser.Math.Distance.Between(
           this.x,
           this.y,
