@@ -1,14 +1,47 @@
 export default class HUD {
-  constructor(scene) {
-    this.scene = scene;
+constructor(scene) {
+  this.scene = scene;
 
-    this.healthBar = this.createHealthBar();
+  this.healthBar = this.createHealthBar();
+  this.scoreText = this.createScoreDisplay(); // ← Tilføjet
+  this.inventory = this.createInventory();
 
-    this.inventory = this.createInventory();
+  this.scene.events.on("playerHealthChanged", this.updateHealth, this);
+}
 
-    //Listen for events about health changes.
-    this.scene.events.on("playerHealthChanged", this.updateHealth, this);
-  }
+createScoreDisplay() {
+  const scoreText = this.scene.add.text(
+    this.scene.cameras.main.width / 2, // X: center af canvas
+    30,                                // Y: lidt nede fra top
+    "Score: 0",
+    {
+      fontSize: "32px",
+      fill: "#ffffff",
+      stroke: "#000000",
+      strokeThickness: 6,
+      fontFamily: "Arial",
+      backgroundColor: "#00000088",
+      padding: { x: 10, y: 5 },
+    }
+  );
+
+  scoreText.setOrigin(0.5, 0);       // Centrer teksten om midten (X)
+  scoreText.setScrollFactor(0);      // Fast til skærmen
+  scoreText.setDepth(9999);          // Øverst
+  scoreText.setScale(1 / this.scene.cameras.main.zoom); // Vis korrekt trods zoom
+
+  return scoreText;
+}
+
+
+
+
+
+
+
+
+
+
 
   createHealthBar() {
     //Add a  container in the bottom right of the view.
