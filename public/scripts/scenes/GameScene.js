@@ -54,6 +54,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+
+this.hud = new HUD(this);
+this.score = 0;
+this.hud.updateScore(this.score);
+
+
+
+
+
     this.hud = new HUD(this);
     this.lastFired = 0; // Initialize the cooldown timer
   
@@ -130,16 +139,18 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemiesManager.enemiesGroup, VandLayer);
 
     this.physics.add.overlap(
-      this.projectiles,
-      this.enemiesManager.enemiesGroup,
-      (bullet, enemy) => {
-        // Deal damage to enemy
-        enemy.takeDamage(20); // Adjust damage amount as needed
-        // Destroy bullet
-        bullet.destroy();
-        console.log("💥 Bullet hit enemy:", enemy.id);
-      }
-    );
+  this.projectiles,
+  this.enemiesManager.enemiesGroup,
+  (bullet, enemy) => {
+    // Giv skade til zombien og send ID på den spiller der skød
+    enemy.takeDamage(20, bullet.shooterId);
+
+    // Ødelæg bullet
+    bullet.destroy();
+
+    console.log("💥 Bullet hit enemy:", enemy.id);
+  }
+);
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
