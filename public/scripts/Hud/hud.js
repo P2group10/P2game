@@ -1,13 +1,17 @@
 export default class HUD {
   constructor(scene) {
     this.scene = scene;
+    let score = 0;
 
     this.healthBar = this.createHealthBar();
 
     this.inventory = this.createInventory();
 
+    this.scoreBoard = this.createScoreBoard(score);
+
     //Listen for events about health changes.
     this.scene.events.on("playerHealthChanged", this.updateHealth, this);
+    this.scene.events.on("scoreChanged", this.updateScore, this);
   }
 
   createHealthBar() {
@@ -28,7 +32,23 @@ export default class HUD {
       maxWidth: 98,
     };
   }
+  createScoreBoard(score) {
+    const scoreBoard = this.scene.add.container(460, 259).setScrollFactor(0);
+   
+    let text = this.scene.add.text(-45, -7.5, "Score: " + score, {
+      fontSize: "1920px",
+      color: "#ffffff",
+      fontFamily: "ArcadeClassic",
+    });
+    text.setScale(0.0085);
+    scoreBoard.add([text]);
+    // Makes sure that the HUD is alway rendered above everything else.
+    scoreBoard.setDepth(9998);
 
+    return {
+      scoreBoard,    
+    };
+  }
   createInventory() {
     // Create a function to display and configrue the inventory slots (maybe x5 item-slots)
   }
@@ -48,5 +68,10 @@ export default class HUD {
     }
   }
 
+  updateScore(score) {
+    // Update the score text
+    this.scoreBoard.text.setText("Score: " + score);
+    console.log("Score: " + score);
+  }
   // Update Inventory
 }
