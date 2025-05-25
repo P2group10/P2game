@@ -7,7 +7,7 @@ export default class HUD {
 
     this.inventory = this.createInventory();
 
-    this.scoreBoard = this.createScoreBoard(score);
+this.scoreBoard = this.createScoreBoard(score).scoreBoard;
 
     //Listen for events about health changes.
     this.scene.events.on("playerHealthChanged", this.updateHealth, this);
@@ -69,9 +69,11 @@ export default class HUD {
   }
 
   updateScore(score) {
-    // Update the score text
-    this.scoreBoard.text.setText("Score: " + score);
-    console.log("Score: " + score);
+  const scoreText = this.scoreBoard.list.find(child => child instanceof Phaser.GameObjects.Text);
+  if (scoreText) {
+    scoreText.setText("Score: " + score);
   }
-  // Update Inventory
+}
+
+
 }
