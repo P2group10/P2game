@@ -55,6 +55,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.hud = new HUD(this);
+    this.score = 0;
     this.lastFired = 0; // Initialize the cooldown timer
   
     // Create map layers
@@ -130,16 +131,21 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemiesManager.enemiesGroup, VandLayer);
 
     this.physics.add.overlap(
-      this.projectiles,
-      this.enemiesManager.enemiesGroup,
-      (bullet, enemy) => {
-        // Deal damage to enemy
-        enemy.takeDamage(20); // Adjust damage amount as needed
-        // Destroy bullet
-        bullet.destroy();
-        console.log("💥 Bullet hit enemy:", enemy.id);
-      }
-    );
+  this.projectiles,
+  this.enemiesManager.enemiesGroup,
+  (bullet, enemy) => {
+    bullet.destroy();
+
+    // Tjek om fjenden dør
+    const wasAlive = enemy.hp > 0;
+    enemy.takeDamage(20);
+    if (wasAlive && enemy.hp <= 0) {
+      this.score += 1;
+      this.events.emit("scoreChanged", this.score);
+    }
+  }
+);
+
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
