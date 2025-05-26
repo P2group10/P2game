@@ -38,14 +38,11 @@ export default class GameScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
-    
+
     this.load.spritesheet("Player4", "assets/Characters/Player4.png", {
       frameWidth: 64,
       frameHeight: 64,
     });
-
-
-
 
     this.load.spritesheet("zombieB", "assets/zombies/zombieB.png", {
       frameWidth: 64,
@@ -57,7 +54,7 @@ export default class GameScene extends Phaser.Scene {
     this.hud = new HUD(this);
     this.score = 0;
     this.lastFired = 0; // Initialize the cooldown timer
-  
+
     // Create map layers
     const map = this.make.tilemap({ key: "trialMap" });
     const tileset = map.addTilesetImage("open_tileset", "open_tileset");
@@ -131,21 +128,20 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemiesManager.enemiesGroup, VandLayer);
 
     this.physics.add.overlap(
-  this.projectiles,
-  this.enemiesManager.enemiesGroup,
-  (bullet, enemy) => {
-    bullet.destroy();
+      this.projectiles,
+      this.enemiesManager.enemiesGroup,
+      (bullet, enemy) => {
+        bullet.destroy();
 
-    // Tjek om fjenden dør
-    const wasAlive = enemy.hp > 0;
-    enemy.takeDamage(20);
-    if (wasAlive && enemy.hp <= 0) {
-      this.score += 1;
-      this.events.emit("scoreChanged", this.score);
-    }
-  }
-);
-
+        // Tjek om fjenden dør
+        const wasAlive = enemy.hp > 0;
+        enemy.takeDamage(20);
+        if (wasAlive && enemy.hp <= 0) {
+          this.score += 1;
+          this.events.emit("scoreChanged", this.score);
+        }
+      }
+    );
 
     // Controls
     this.cursors = this.input.keyboard.addKeys({
@@ -167,83 +163,89 @@ export default class GameScene extends Phaser.Scene {
 
   // shoot function
   shootProjectile() {
-  // Sætter standard retning til den retning spilleren kigger
-  let facingX = this.player.facing.x;
-  let facingY = this.player.facing.y;
+    // Sætter standard retning til den retning spilleren kigger
+    let facingX = this.player.facing.x;
+    let facingY = this.player.facing.y;
 
-  // Overskirver retningen hvis der er trykket på en af piletasterne
-  if (this.cursors.up.isDown) {
-    facingX = 0;
-    facingY = -1;
-  } else if (this.cursors.down.isDown) {
-    facingX = 0;
-    facingY = 1;
-  } else if (this.cursors.left.isDown) {
-    facingX = -1;
-    facingY = 0;
-  } else if (this.cursors.right.isDown) {
-    facingX = 1;
-    facingY = 0;
-  }
-  if (this.cursors.up.isDown && this.cursors.left.isDown) {
-    facingX = -1;
-    facingY = -1;
-  } else if (this.cursors.up.isDown && this.cursors.right.isDown) {
-    facingX = 1;
-    facingY = -1;
-  } else if (this.cursors.down.isDown && this.cursors.left.isDown) {
-    facingX = -1;
-    facingY = 1;
-  } else if (this.cursors.down.isDown && this.cursors.right.isDown) {
-    facingX = 1;
-    facingY = 1;
-  }
+    // Overskirver retningen hvis der er trykket på en af piletasterne
+    if (this.cursors.up.isDown) {
+      facingX = 0;
+      facingY = -1;
+    } else if (this.cursors.down.isDown) {
+      facingX = 0;
+      facingY = 1;
+    } else if (this.cursors.left.isDown) {
+      facingX = -1;
+      facingY = 0;
+    } else if (this.cursors.right.isDown) {
+      facingX = 1;
+      facingY = 0;
+    }
+    if (this.cursors.up.isDown && this.cursors.left.isDown) {
+      facingX = -1;
+      facingY = -1;
+    } else if (this.cursors.up.isDown && this.cursors.right.isDown) {
+      facingX = 1;
+      facingY = -1;
+    } else if (this.cursors.down.isDown && this.cursors.left.isDown) {
+      facingX = -1;
+      facingY = 1;
+    } else if (this.cursors.down.isDown && this.cursors.right.isDown) {
+      facingX = 1;
+      facingY = 1;
+    }
 
+    // normaliser retningen for at sikre at hastigheden er ens uanset retning
+    const direction = new Phaser.Math.Vector2(facingX, facingY).normalize();
+    const defaultFacing = new Phaser.Math.Vector2(
+      this.player.facing.x,
+      this.player.facing.y
+    ).normalize();
 
-  // normaliser retningen for at sikre at hastigheden er ens uanset retning
-  const direction = new Phaser.Math.Vector2(facingX, facingY).normalize();
-  const defaultFacing = new Phaser.Math.Vector2(this.player.facing.x, this.player.facing.y).normalize();
+    // Opretter en ny bullet og sætter bulletens position til spillerens position
+    const bullet = this.projectiles.create(
+      this.player.x,
+      this.player.y,
+      "bullet"
+    );
+    bullet.setScale(0.1);
+    bullet.setCollideWorldBounds(true);
+    bullet.body.onWorldBounds = true;
 
-  // Opretter en ny bullet og sætter bulletens position til spillerens position
-  const bullet = this.projectiles.create(this.player.x, this.player.y, "bullet");
-  bullet.setScale(0.1);
-  bullet.setCollideWorldBounds(true);
-  bullet.body.onWorldBounds = true;
+    bullet.shooterId = this.socket.id;
 
-  bullet.shooterId = this.socket.id;
-
-// Sætter bulletens hastighed
+    // Sætter bulletens hastighed
 
     const speed = 400;
     const velocityX = direction.x * speed;
     const velocityY = direction.y * speed;
-  
+
     bullet.setVelocity(velocityX, velocityY);
 
-  // Udregner bulletens retning og vinkel
-  const angleRad = Math.atan2(direction.y, direction.x); // radians
-  const angleDeg = Phaser.Math.RadToDeg(angleRad); // convert to degrees
-  bullet.setAngle(angleDeg);
+    // Udregner bulletens retning og vinkel
+    const angleRad = Math.atan2(direction.y, direction.x); // radians
+    const angleDeg = Phaser.Math.RadToDeg(angleRad); // convert to degrees
+    bullet.setAngle(angleDeg);
 
-  // Ødelægger bulleten efter 1 sekund
-  this.time.delayedCall(1000, () => {
-    bullet.destroy();
-  });
+    // Ødelægger bulleten efter 1 sekund
+    this.time.delayedCall(1000, () => {
+      bullet.destroy();
+    });
 
-  // Sender bulletens data til serveren
-  this.socket.emit("shoot", {
-    roomCode: this.roomCode,
-    x: this.player.x,
-    y: this.player.y,
-    velocityX: velocityX,
-    velocityY: velocityY,
-    angle: angleDeg,
-    speed: speed,
-    facingX: direction.x,
-    facingY: direction.y,
-    playerId: this.socket.id,
-  });
-}
+    // Sender bulletens data til serveren
+    this.socket.emit("shoot", {
+      roomCode: this.roomCode,
+      x: this.player.x,
+      y: this.player.y,
+      velocityX: velocityX,
+      velocityY: velocityY,
+      angle: angleDeg,
+      speed: speed,
+      facingX: direction.x,
+      facingY: direction.y,
+      playerId: this.socket.id,
+    });
+  }
 
   createLocalPlayer() {
     let startX = 400;
@@ -388,10 +390,7 @@ export default class GameScene extends Phaser.Scene {
             const playerId = data.playerId;
             // If it's our own player, transition to game over
             if (playerId === this.socket.id) {
-              this.scene.start("GameOverScene", {
-                playerName: this.playerName,
-                roomCode: this.roomCode,
-              });
+              this.scene.start("GameOverScene", { score: this.hud.score });
               return;
             }
             // If it's another player, remove their sprite
@@ -441,11 +440,7 @@ export default class GameScene extends Phaser.Scene {
       // For local player
       if (data.playerId === this.socket.id) {
         // Clean up before scene transition
-        this.cleanupBeforeSceneChange();
-        this.scene.start("GameOverScene", {
-          playerName: this.playerName,
-          roomCode: this.roomCode,
-        });
+          this.scene.start("GameOverScene", { score: hud.score });        
         return;
       }
 
@@ -589,7 +584,6 @@ export default class GameScene extends Phaser.Scene {
     this.enemiesManager.setupCollisions(this.allPlayers);
   }
 
-
   spawnPeriodicEnemy() {
     if (!this.isHost) return;
 
@@ -631,7 +625,6 @@ export default class GameScene extends Phaser.Scene {
     }
     const fireRate = 250; // Cooldown in milliseconds (e.g., 500ms = 0.5 seconds)
 
-
     if (time > this.lastFired + fireRate) {
       if (this.cursors.up.isDown && this.cursors.left.isDown) {
         this.shootProjectile(-1, -1); // Fire diagonally upward-left
@@ -659,19 +652,18 @@ export default class GameScene extends Phaser.Scene {
         this.lastFired = time;
       }
     }
-    
 
     if (this.player) {
       this.player.update(this.cursors);
 
       let x = 0;
       let y = 0;
-      
+
       if (this.cursors.w.isDown) y = -1;
       if (this.cursors.s.isDown) y = 1;
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
-      
+
       // Kun opdater facing, hvis der er input
       if (x !== 0 || y !== 0) {
         this.player.facing = { x, y };
