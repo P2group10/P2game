@@ -152,7 +152,9 @@ export default class MultiplayerEnemiesManager {
         roomCode: this.roomCode,
         enemyId: enemyId
       });
-      
+      this.socket.emit("zombieKilled", { roomCode: this.roomCode });
+
+      console.log(`Enemy ${enemyId} killed`);
       // Destroy the enemy
       const enemy = this.enemies[enemyId];
       if (enemy) {
