@@ -386,22 +386,6 @@ export default class GameScene extends Phaser.Scene {
               otherPlayer.play(data.animation);
             }
           }
-          this.socket.on("player-death", (data) => {
-            const playerId = data.playerId;
-            // If it's our own player, transition to game over
-            if (playerId === this.socket.id) {
-              this.scene.start("GameOverScene", { score: this.hud.score });
-              return;
-            }
-            // If it's another player, remove their sprite
-            if (this.otherPlayers[playerId]) {
-              this.otherPlayers[playerId].destroy();
-              if (this.otherPlayers[playerId].nameText) {
-                this.otherPlayers[playerId].nameText.destroy();
-              }
-              delete this.otherPlayers[playerId];
-            }
-          });
         }
       }
     });
@@ -436,13 +420,13 @@ export default class GameScene extends Phaser.Scene {
 
     this.socket.on("new-host", (data) => {
       // Update local host status
-      this.isHost = (data.newHostId === this.socket.id);
-      
+      this.isHost = data.newHostId === this.socket.id;
+
       // Update enemy manager host status
       if (this.enemiesManager) {
         this.enemiesManager.isHost = this.isHost;
       }
-      
+
       if (this.isHost) {
         // Set up a timer to spawn new enemies periodically
         this.time.addEvent({
@@ -459,19 +443,25 @@ export default class GameScene extends Phaser.Scene {
       const playerId = data.playerId;
 
       // For local player
-      if (data.playerId === this.socket.id) {
-        // Clean up before scene transition
-          this.scene.start("GameOverScene", { score: hud.score });        
+      if (playerId === this.socket.id) {
+        this.scene.start("GameOverScene", { score: this.score });
         return;
       }
 
       // For remote players
-      if (this.otherPlayers[data.playerId]) {
-        const player = this.otherPlayers[data.playerId];
-        // Safe cleanup
-        if (player.nameText) player.nameText.destroy();
+      if (this.otherPlayers[playerId]) {
+        const player = this.otherPlayers[playerId];
+
+        // Destroy name text
+        if (player.nameText) {
+          player.nameText.destroy();
+        }
+
+        // Destroy player
         player.destroy();
-        delete this.otherPlayers[data.playerId];
+
+        // Remove from tracking
+        delete this.otherPlayers[playerId];
       }
     });
 
@@ -509,7 +499,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createRemotePlayer(data) {
-    if (!this.scene || !this.scene.isActive()) return null;
     let remotePlayer;
 
     // Create the appropriate character based on their selected model
@@ -642,9 +631,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (!this.player || !this.player.active || !this.player.body) {
-      return;
-    }
     const fireRate = 250; // Cooldown in milliseconds (e.g., 500ms = 0.5 seconds)
 
     if (time > this.lastFired + fireRate) {
@@ -686,22 +672,6 @@ export default class GameScene extends Phaser.Scene {
       if (this.cursors.a.isDown) x = -1;
       if (this.cursors.d.isDown) x = 1;
 
-      // Kun opdater facing, hvis der er input
-      if (x !== 0 || y !== 0) {
-        this.player.facing = { x, y };
-      }
-
-      // Testing damage when "1" is pressed
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.one)) {
-        // Take damage
-        this.player.takeDamage(10); // Reduce health by 10
-      }
-      // Testing healing when "2" is pressed.
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.two)) {
-        // Heal
-        this.player.heal(10); // Increase health by 10
-      }
-
       // Update other players' name text positions
       for (const playerId in this.otherPlayers) {
         const player = this.otherPlayers[playerId];
@@ -732,16 +702,15 @@ export default class GameScene extends Phaser.Scene {
         this.player.x !== this.previousX ||
         this.player.y !== this.previousY
       ) {
-        if (this.player && this.player.anims && this.player.active) {
-          const currentAnim =
-            this.player.anims.currentAnim?.key || "idlePlayerM"; // Default fallback
+        if (this.player && this.player.anims && this.player.playerHP > 0) {
+          const currentAnim = this.player.anims.currentAnim?.key; // Default fallback
           this.socket.emit("playerPosition", {
             roomCode: this.roomCode,
             playerId: this.socket.id,
             playerName: this.playerName,
             x: this.player.x,
             y: this.player.y,
-            animation: this.player.anims.currentAnim?.key || startAnimation,
+            animation: this.player.anims.currentAnim?.key,
             spriteModel: this.character,
             playerHP: this.player.playerHP,
           });
