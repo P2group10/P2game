@@ -7,7 +7,7 @@ export default class GameOverScene extends Phaser.Scene {
     const score = data.score;
 
     this.add
-      .text(center, center, "Your score was: " + score, {
+      .text(600, 375, "Your score was: " + score, {
         fontSize: "64px",
         fill: "#ff0000",
         fontFamily: "zombie",
