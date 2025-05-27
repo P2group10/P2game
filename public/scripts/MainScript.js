@@ -1,8 +1,10 @@
+// Importing all the scenes
 import CharacterSelectScene from "/scripts/scenes/CharacterSelectScene.js";
 import MenuScene from "/scripts/scenes/MenuScene.js";
 import GameScene from "/scripts/scenes/GameScene.js";
 import GameOverScene from "/scripts/scenes/GameOverScene.js";
 
+// Configuring the game
 const config = {
   type: Phaser.AUTO,
   backgroundColor: "#FFFF",
@@ -24,5 +26,5 @@ const config = {
     },
   },
 };
-
+// Creating the game instance
 const game = new Phaser.Game(config);

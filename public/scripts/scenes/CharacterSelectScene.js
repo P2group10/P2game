@@ -12,7 +12,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
     this.players = data.players || []; // Initialize with players if provided
     console.log("CharacterSelectScene initialized with players:", this.players);
   }
-
+// Preload assets for the scene
   preload() {
     this.load.image(
       "character1",
@@ -115,7 +115,6 @@ export default class CharacterSelectScene extends Phaser.Scene {
       this.selectCharacter("character4");
       this.updatePlayerList();
     });
-
 
     // Ready Button
     this.readyButton = this.add

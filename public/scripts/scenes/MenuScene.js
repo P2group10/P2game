@@ -1,6 +1,7 @@
 import TextInput from "../Buttons/InputTextBox.js";
 import CharacterSelectScene from "./CharacterSelectScene.js";
 
+// Creating a class for the Menu Scene
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super("MenuScene");
@@ -22,7 +23,7 @@ export default class MenuScene extends Phaser.Scene {
       this.setupSocketListeners();
     }
   }
-
+// Preload assets for the scene
   preload() {
     this.load.image(
       "BackGroundImageStart",
@@ -30,7 +31,7 @@ export default class MenuScene extends Phaser.Scene {
     );
     this.load.image("logo", "assets/images/logo.png");
   }
-
+// Create the scene and set up the UI elements
   create() {
     let centerX = this.cameras.main.centerX;
     let centerY = this.cameras.main.centerY;
@@ -42,7 +43,7 @@ export default class MenuScene extends Phaser.Scene {
       750,
       "BackGroundImageStart"
     );
-
+// Adding the logo
     const logo = this.add.image(centerX, centerY - 250, "logo");
 
     const buttonStyle = {
@@ -52,10 +53,8 @@ export default class MenuScene extends Phaser.Scene {
       backgroundColor: "#222",
     };
 
-    
-
     this.textInput = new TextInput();
-
+// Adding the "Join Room" and "Create Room" buttons
     let JoinRoomButton = this.add
       .text(centerX, centerY + 50, "Join Room", buttonStyle)
       .setOrigin(0.5)
@@ -73,7 +72,7 @@ export default class MenuScene extends Phaser.Scene {
     CreateRoomButton.on("pointerout", () => CreateRoomButton.setScale(1));
     CreateRoomButton.on("pointerdown", () => this.showCreateRoomInput());
   }
-
+// Set up socket listeners for room creation and joining
   setupSocketListeners() {
     // Remove any existing listeners first
     this.socket.off("room-create-response");
@@ -89,7 +88,7 @@ export default class MenuScene extends Phaser.Scene {
       this.handleRoomResponse(response, false);
     });
   }
-
+// Show input for joining a room
   showJoinRoomInput() {
     const inputElement = this.textInput.showJoinRoomInput();
     let isJoining = false;
@@ -105,7 +104,7 @@ export default class MenuScene extends Phaser.Scene {
       }
     });
   }
-
+// Show input for creating a room
   showCreateRoomInput() {
     const inputElement = this.textInput.showCreateRoomInput();
     let isCreating = false;
@@ -126,7 +125,7 @@ export default class MenuScene extends Phaser.Scene {
       }
     });
   }
-
+// Handle the response from the server for room creation or joining
   handleRoomResponse(response, isHost) {
     if (response.success) {
       const inputs = document.querySelectorAll('input[type="text"]');
@@ -141,16 +140,15 @@ export default class MenuScene extends Phaser.Scene {
       alert(response.message);
     }
   }
-
+  // Destroy and clean up socket listeners
   destroy() {
-    // Clean up socket listeners
     if (this.socket) {
       this.socket.off("room-create-response");
       this.socket.off("room-join-response");
     }
     super.destroy();
   }
-
+// Constantly update the background position for a scrolling effect
   update() {
     this.background.tilePositionX += 2;
   }
