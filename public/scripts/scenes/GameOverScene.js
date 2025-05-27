@@ -5,16 +5,17 @@ export default class GameOverScene extends Phaser.Scene {
 
   create(data) {
     const score = data.score;
-  
+
     this.add
-      .text(650, 450, "Your score was: " + score, {
+      .text(center, center, "Your score was: " + score, {
         fontSize: "64px",
         fill: "#ff0000",
+        fontFamily: "zombie",
       })
-      .setOrigin(0.5);
-  
+      .setOrigin(0.0);
+
     this.time.delayedCall(3000, () => {
       window.location.reload();
     });
   }
-}  
+}

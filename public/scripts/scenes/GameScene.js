@@ -443,6 +443,15 @@ export default class GameScene extends Phaser.Scene {
         this.enemiesManager.isHost = this.isHost;
       }
       
+      if (this.isHost) {
+        // Set up a timer to spawn new enemies periodically
+        this.time.addEvent({
+          delay: 500, // 20 seconds
+          callback: this.spawnPeriodicEnemy,
+          callbackScope: this,
+          loop: true,
+        });
+      }
       console.log(`New host: ${data.newHostId}, Am I host: ${this.isHost}`);
     });
 
@@ -528,11 +537,13 @@ export default class GameScene extends Phaser.Scene {
 
     // Create a name label above the player
     const nameText = this.add.text(data.x, data.y - 25, data.playerName, {
-      fontSize: "5px",
+      fontSize: "500px",
       fill: "#ffffff",
       backgroundColor: "#00000080",
       padding: { x: 3, y: 1 },
     });
+    nameText.setFontFamily("Arial");
+    nameText.setScale(0.02);
     nameText.setOrigin(0.5, 0.5);
 
     // Store the text reference with the player
@@ -573,11 +584,10 @@ export default class GameScene extends Phaser.Scene {
       this.roomCode
     );
 
-    // If this client is the host, spawn some initial enemies
     if (this.isHost) {
       // Set up a timer to spawn new enemies periodically
       this.time.addEvent({
-        delay: 1000, // 20 seconds
+        delay: 500, // 20 seconds
         callback: this.spawnPeriodicEnemy,
         callbackScope: this,
         loop: true,
