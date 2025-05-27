@@ -30,8 +30,6 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
   }
 
   update(cursors) {
-    if (!this.active || !this.body || !this.scene) return;
-
     let velocity = 160;
     let sprintVelocit = 300;
 
@@ -134,10 +132,6 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
   }
   takeDamage(amount) {
     // Safety check for scene
-    if (!this.scene || !this.scene.scene) {
-      console.error("Scene or scene manager is undefined in takeDamage!");
-      return;
-    }
 
     this.health -= amount;
     if (this.health < 0) {
@@ -155,16 +149,6 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
     this.setTint(0xff0000);
     this.scene.time.delayedCall(100, () => {
       this.clearTint();
-    });
-
-    console.table({
-      playerId: this.scene.socket.id,
-      playerName: this.scene.playerName,
-      x: this.x,
-      y: this.y,
-      animation: this.anims?.currentAnim?.key,
-      Character: this.scene.character,
-      playerHp: this.health,
     });
 
     // Emit health update

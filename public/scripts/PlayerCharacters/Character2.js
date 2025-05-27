@@ -132,10 +132,6 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
   }
   takeDamage(amount) {
     // Safety check for scene
-    if (!this.scene || !this.scene.scene) {
-      console.error("Scene or scene manager is undefined in takeDamage!");
-      return;
-    }
 
     this.health -= amount;
     if (this.health < 0) {
