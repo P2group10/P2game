@@ -243,6 +243,8 @@ socket.on("player-death", (data) => {
   const room = activeRooms[roomCode];
   if (!room) return;
 
+  const wasHost = (playerId === room.host);
+
   // Remove the player from the room
   const playerIndex = room.players.findIndex(p => p.id === playerId);
   if (playerIndex !== -1) {
@@ -251,6 +253,19 @@ socket.on("player-death", (data) => {
     // Notify all clients about the player death
     io.to(roomCode).emit("player-died", { playerId });
     
+    // Handle host transfer if the host died
+    if (wasHost && room.players.length > 0) {
+      // Assign new host to the first remaining player
+      room.host = room.players[0].id;
+      
+      console.log(`[HOST TRANSFER] New host for room ${roomCode}: ${room.host}`);
+      
+      // Notify all remaining players about the new host
+      io.to(roomCode).emit("new-host", { 
+        newHostId: room.host
+      });
+    }
+
     // Clean up empty rooms
     if (room.players.length === 0) {
       delete activeRooms[roomCode];

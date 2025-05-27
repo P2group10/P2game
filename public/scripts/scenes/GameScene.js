@@ -434,6 +434,18 @@ export default class GameScene extends Phaser.Scene {
       );
     });
 
+    this.socket.on("new-host", (data) => {
+      // Update local host status
+      this.isHost = (data.newHostId === this.socket.id);
+      
+      // Update enemy manager host status
+      if (this.enemiesManager) {
+        this.enemiesManager.isHost = this.isHost;
+      }
+      
+      console.log(`New host: ${data.newHostId}, Am I host: ${this.isHost}`);
+    });
+
     this.socket.on("player-died", (data) => {
       const playerId = data.playerId;
 
