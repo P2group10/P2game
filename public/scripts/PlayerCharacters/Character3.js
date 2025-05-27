@@ -36,31 +36,23 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
     if (this.isLocalPlayer) {
       // Movement logic
       if (cursors.shift.isDown) {
-        if (
-          (cursors.a.isDown && cursors.w.isDown) 
-        ) {
+        if (cursors.a.isDown && cursors.w.isDown) {
           this.setVelocity(-sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpCharacter3", true);
           this.animation = "sprintUpCharacter3";
-        } else if (
-          (cursors.a.isDown && cursors.s.isDown) 
-        ) {
+        } else if (cursors.a.isDown && cursors.s.isDown) {
           this.setVelocity(-sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownCharacter3", true);
           this.animation = "sprintDownCharacter3";
-        } else if (
-          (cursors.d.isDown && cursors.w.isDown) 
-        ) {
+        } else if (cursors.d.isDown && cursors.w.isDown) {
           this.setVelocity(sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpCharacter3", true);
           this.animation = "sprintUpCharacter3";
-        } else if (
-          (cursors.d.isDown && cursors.s.isDown)
-        ) {
+        } else if (cursors.d.isDown && cursors.s.isDown) {
           this.setVelocity(sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownCharacter3", true);
           this.animation = "sprintDownCharacter3";
-        } else if (cursors.a.isDown ) {
+        } else if (cursors.a.isDown) {
           this.setVelocityX(-sprintVelocit);
           this.anims.play("sprintLeftCharacter3", true);
           this.animation = "sprintLeftCharacter3";
@@ -68,38 +60,30 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
           this.setVelocityX(sprintVelocit);
           this.anims.play("sprintRightCharacter3", true);
           this.animation = "sprintRightCharacter3";
-        } else if (cursors.w.isDown ) {
+        } else if (cursors.w.isDown) {
           this.setVelocityY(-sprintVelocit);
           this.anims.play("sprintUpCharacter3", true);
           this.animation = "sprintUpCharacter3";
-        } else if (cursors.s.isDown ) {
+        } else if (cursors.s.isDown) {
           this.setVelocityY(sprintVelocit);
           this.anims.play("sprintDownCharacter3", true);
           this.animation = "sprintDownCharacter3";
         }
       }
       // Walk movement
-      else if (
-        (cursors.a.isDown && cursors.w.isDown)
-      ) {
+      else if (cursors.a.isDown && cursors.w.isDown) {
         this.setVelocity(-velocity, -velocity);
         this.anims.play("walkUpCharacter3", true);
         this.animation = "walkUpCharacter3";
-      } else if (
-        (cursors.a.isDown && cursors.s.isDown) 
-      ) {
+      } else if (cursors.a.isDown && cursors.s.isDown) {
         this.setVelocity(-velocity, velocity);
         this.anims.play("walkDownCharacter3", true);
         this.animation = "walkDownCharacter3";
-      } else if (
-        (cursors.d.isDown && cursors.w.isDown)
-      ) {
+      } else if (cursors.d.isDown && cursors.w.isDown) {
         this.setVelocity(velocity, -velocity);
         this.anims.play("walkUpCharacter3", true);
         this.animation = "walkUpCharacter3";
-      } else if (
-        (cursors.d.isDown && cursors.s.isDown) 
-      ) {
+      } else if (cursors.d.isDown && cursors.s.isDown) {
         this.setVelocity(velocity, velocity);
         this.anims.play("walkDownCharacter3", true);
         this.animation = "walkDownCharacter3";
@@ -109,15 +93,15 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityX(-velocity);
         this.anims.play("walkLeftCharacter3", true);
         this.animation = "walkLeftCharacter3";
-      } else if (cursors.d.isDown ) {
+      } else if (cursors.d.isDown) {
         this.setVelocityX(velocity);
         this.anims.play("walkRightCharacter3", true);
         this.animation = "walkRightCharacter3";
-      } else if (cursors.w.isDown ) {
+      } else if (cursors.w.isDown) {
         this.setVelocityY(-velocity);
         this.anims.play("walkUpCharacter3", true);
         this.animation = "walkUpCharacter3";
-      } else if (cursors.s.isDown ) {
+      } else if (cursors.s.isDown) {
         this.setVelocityY(velocity);
         this.anims.play("walkDownCharacter3", true);
         this.animation = "walkDownCharacter3";
@@ -130,17 +114,11 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
       }
 
       // **Fix: Explicitly stop movement when keys are released**
-      if (
-        !cursors.a.isDown &&
-        !cursors.d.isDown
-      ) {
+      if (!cursors.a.isDown && !cursors.d.isDown) {
         this.setVelocityX(0);
       }
 
-      if (
-        !cursors.w.isDown &&
-        !cursors.s.isDown
-      ) {
+      if (!cursors.w.isDown && !cursors.s.isDown) {
         this.setVelocityY(0);
       }
 
@@ -201,32 +179,21 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
 
     // Check for death
     if (this.health <= 0) {
-      if (this.scene.socket) {
-        this.scene.socket.emit("player-death", {
-          roomCode: this.scene.roomCode,
-          playerId: this.scene.socket.id,
-        });
-      }
+      this.isDead = true;
+      this.scene.socket.emit("player-death", {
+        roomCode: this.scene.roomCode,
+        playerId: this.scene.socket.id,
+      });
+      // Disconnect immediately
+      this.socket.disconnect();
 
-      // Store scene reference before destroying the player
+      // Transition to GameOver scene
       const scene = this.scene;
-
-      // Destroy player
-      this.destroy();
-      if (this.nameText) {
-        this.nameText.destroy();
-      }
-
-      // Use a delayed call to ensure clean transition
       scene.time.delayedCall(100, () => {
-        if (scene.scene) {
-          // Check if scene manager still exists
-          scene.scene.start("GameOverScene", {
-            playerName: scene.playerName,
-            score: scene.score || 0,
-            isWinner: false,
-          });
-        }
+        scene.scene.start("GameOverScene", {
+          playerName: scene.playerName,
+          score: scene.score || 0,
+        });
       });
     }
   }

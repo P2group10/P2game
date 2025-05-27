@@ -271,7 +271,6 @@ socket.on("player-death", (data) => {
       delete activeRooms[roomCode];
     } else {
       // Update player list for remaining players
-      io.to(roomCode).emit("player-list-update", room.players);
     }
   }
 });

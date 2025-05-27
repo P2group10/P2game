@@ -1,6 +1,7 @@
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameOverScene" });
+
   }
 
   // Preload assets for the scene

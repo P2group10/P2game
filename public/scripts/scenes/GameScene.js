@@ -330,6 +330,17 @@ export default class GameScene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.startFollow(this.player);
     camera.setZoom(3);
+
+    this.socket.emit("playerPosition", {
+      roomCode: this.roomCode,
+      playerId: this.socket.id,
+      playerName: this.playerName,
+      x: this.player.x,
+      y: this.player.y,
+      animation: this.player.anims.currentAnim?.key,
+      spriteModel: this.character,
+      playerHP: this.player.playerHP,
+    });
   }
 
   setupSocketListeners() {
@@ -339,7 +350,16 @@ export default class GameScene extends Phaser.Scene {
       if (data.playerId === this.socket.id) return;
 
       // Create player if it doesn't exist yet
-      if (!this.otherPlayers[data.playerId]) {
+
+      console.log("Position update received:", {
+        playerId: data.playerId,
+        Character: data.Character,
+        typeof_Character: typeof data.Character,
+        playerHP: data.playerHp,
+        hasCharacter: !!data.Character,
+      });
+
+      if (!this.otherPlayers[data.playerId] && data.playerHp) {
         this.createRemotePlayer(data);
       }
 
@@ -360,25 +380,25 @@ export default class GameScene extends Phaser.Scene {
           otherPlayer.play(data.animation);
           if (data.animation) {
             otherPlayer.play(data.animation);
-            if (data.spriteModel === "character1") {
+            if (data.Character === "character1") {
               console.log(
                 "Creating remote player with character1:",
                 data.animation
               );
               otherPlayer.play(data.animation);
-            } else if (data.spriteModel === "character2") {
+            } else if (data.Character === "character2") {
               console.log(
                 "Creating remote player with character2:",
                 data.animation
               );
               otherPlayer.play(data.animation);
-            } else if (data.spriteModel === "character3") {
+            } else if (data.Character === "character3") {
               console.log(
                 "Creating remote player with character3:",
                 data.animation
               );
               otherPlayer.play(data.animation);
-            } else if (data.spriteModel === "character4") {
+            } else if (data.Character === "character4") {
               console.log(
                 "Creating remote player with character4:",
                 data.animation
@@ -444,7 +464,17 @@ export default class GameScene extends Phaser.Scene {
 
       // For local player
       if (playerId === this.socket.id) {
-        this.scene.start("GameOverScene", { score: this.score });
+        console.log("Local player died, transitioning to GameOver...");
+        // Clean up immediately
+        
+          this.player.destroy();
+          this.player = null;
+          this.socket.disconnect();
+
+        this.scene.start("GameOverScene", {
+          score: this.score,
+          playerName: this.playerName,
+        });
         return;
       }
 
@@ -500,22 +530,23 @@ export default class GameScene extends Phaser.Scene {
 
   createRemotePlayer(data) {
     let remotePlayer;
+    let startAnimation;
+    console.log("Full data object:", data);
 
     // Create the appropriate character based on their selected model
-    if (data.spriteModel === "character1") {
+    if (data.Character == "character1") {
       remotePlayer = new character1(this, data.x, data.y, "PlayerM");
-    } else if (data.spriteModel === "character2") {
+    } else if (data.Character == "character2") {
       remotePlayer = new character2(this, data.x, data.y, "TestPlayer");
       startAnimation = "idlePlayerM";
-    } else if (data.spriteModel === "character3") {
+    } else if (data.Character == "character3") {
       remotePlayer = new character3(this, data.x, data.y, "Character3");
       startAnimation = "idleCharacter3";
-    } else if (data.spriteModel === "character4") {
+    } else if (data.Character == "character4") {
       remotePlayer = new character4(this, data.x, data.y, "Player4");
       startAnimation = "idlePlayer4";
     } else {
-      // Default case
-      remotePlayer = new character3(this, data.x, data.y, "Character3");
+      return;
     }
 
     remotePlayer.isLocalPlayer = false;
@@ -702,8 +733,9 @@ export default class GameScene extends Phaser.Scene {
         this.player.x !== this.previousX ||
         this.player.y !== this.previousY
       ) {
-        if (this.player && this.player.anims && this.player.playerHP > 0) {
+        if (this.player && this.player.anims && !this.player.isDead) {
           const currentAnim = this.player.anims.currentAnim?.key; // Default fallback
+          console.log(this.player.playerHP);
           this.socket.emit("playerPosition", {
             roomCode: this.roomCode,
             playerId: this.socket.id,

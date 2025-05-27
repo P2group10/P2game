@@ -39,27 +39,19 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
     if (this.isLocalPlayer) {
       // Movement logic
       if (cursors.shift.isDown) {
-        if (
-          (cursors.a.isDown && cursors.w.isDown)
-        ) {
+        if (cursors.a.isDown && cursors.w.isDown) {
           this.setVelocity(-sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpTestPlayer", true);
           this.animation = "sprintUpTestPlayer";
-        } else if (
-          (cursors.a.isDown && cursors.s.isDown) 
-        ) {
+        } else if (cursors.a.isDown && cursors.s.isDown) {
           this.setVelocity(-sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownTestPlayer", true);
           this.animation = "sprintDownTestPlayer";
-        } else if (
-          (cursors.d.isDown && cursors.w.isDown) 
-        ) {
+        } else if (cursors.d.isDown && cursors.w.isDown) {
           this.setVelocity(sprintVelocit, -sprintVelocit);
           this.anims.play("sprintUpTestPlayer", true);
           this.animation = "sprintUpTestPlayer";
-        } else if (
-          (cursors.d.isDown && cursors.s.isDown) 
-        ) {
+        } else if (cursors.d.isDown && cursors.s.isDown) {
           this.setVelocity(sprintVelocit, sprintVelocit);
           this.anims.play("sprintDownTestPlayer", true);
           this.animation = "sprintDownTestPlayer";
@@ -75,34 +67,26 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
           this.setVelocityY(-sprintVelocit);
           this.anims.play("sprintUpTestPlayer", true);
           this.animation = "sprintUpTestPlayer";
-        } else if (cursors.s.isDown ) {
+        } else if (cursors.s.isDown) {
           this.setVelocityY(sprintVelocit);
           this.anims.play("sprintDownTestPlayer", true);
           this.animation = "sprintDownTestPlayer";
         }
       }
       // Walk movement
-      else if (
-        (cursors.a.isDown && cursors.w.isDown) 
-      ) {
+      else if (cursors.a.isDown && cursors.w.isDown) {
         this.setVelocity(-velocity, -velocity);
         this.anims.play("walkUpTestPlayer", true);
         this.animation = "walkUpTestPlayer";
-      } else if (
-        (cursors.a.isDown && cursors.s.isDown) 
-      ) {
+      } else if (cursors.a.isDown && cursors.s.isDown) {
         this.setVelocity(-velocity, velocity);
         this.anims.play("walkDownTestPlayer", true);
         this.animation = "walkDownTestPlayer";
-      } else if (
-        (cursors.d.isDown && cursors.w.isDown) 
-      ) {
+      } else if (cursors.d.isDown && cursors.w.isDown) {
         this.setVelocity(velocity, -velocity);
         this.anims.play("walkUpTestPlayer", true);
         this.animation = "walkUpTestPlayer";
-      } else if (
-        (cursors.d.isDown && cursors.s.isDown)
-      ) {
+      } else if (cursors.d.isDown && cursors.s.isDown) {
         this.setVelocity(velocity, velocity);
         this.anims.play("walkDownTestPlayer", true);
         this.animation = "walkDownTestPlayer";
@@ -133,17 +117,11 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
       }
 
       // **Fix: Explicitly stop movement when keys are released**
-      if (
-        !cursors.a.isDown &&
-        !cursors.d.isDown
-      ) {
+      if (!cursors.a.isDown && !cursors.d.isDown) {
         this.setVelocityX(0);
       }
 
-      if (
-        !cursors.w.isDown &&
-        !cursors.s.isDown
-      ) {
+      if (!cursors.w.isDown && !cursors.s.isDown) {
         this.setVelocityY(0);
       }
 
@@ -214,32 +192,21 @@ export default class character1 extends Phaser.Physics.Arcade.Sprite {
 
     // Check for death
     if (this.health <= 0) {
-      if (this.scene.socket) {
-        this.scene.socket.emit("player-death", {
-          roomCode: this.scene.roomCode,
-          playerId: this.scene.socket.id,
-        });
-      }
+      this.isDead = true;
+      this.scene.socket.emit("player-death", {
+        roomCode: this.scene.roomCode,
+        playerId: this.scene.socket.id,
+      });
+      // Disconnect immediately
+      this.socket.disconnect();
 
-      // Store scene reference before destroying the player
+      // Transition to GameOver scene
       const scene = this.scene;
-
-      // Destroy player
-      this.destroy();
-      if (this.nameText) {
-        this.nameText.destroy();
-      }
-
-      // Use a delayed call to ensure clean transition
       scene.time.delayedCall(100, () => {
-        if (scene.scene) {
-          // Check if scene manager still exists
-          scene.scene.start("GameOverScene", {
-            playerName: scene.playerName,
-            score: scene.score || 0,
-            isWinner: false,
-          });
-        }
+        scene.scene.start("GameOverScene", {
+          playerName: scene.playerName,
+          score: scene.score || 0,
+        });
       });
     }
   }
