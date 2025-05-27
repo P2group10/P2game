@@ -5,6 +5,10 @@ export default class characterAnims extends Phaser.Physics.Arcade.Sprite {
     this.createTestPlayerAnimations(scene);
     // PlayerM animations
     this.createPlayerMAnimations(scene);
+    //Character3 animations
+    this.createCharacter3Animations(scene);
+    //Player4 animations
+    this.createPlayer4Animations(scene);
   }
 
   static createTestPlayerAnimations(scene) {
@@ -184,6 +188,190 @@ export default class characterAnims extends Phaser.Physics.Arcade.Sprite {
     scene.anims.create({
       key: "sprintDownPlayerM",
       frames: scene.anims.generateFrameNumbers("PlayerM", {
+        start: 520,
+        end: 527,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+  }
+  //-----Define animations---------Character3-----------------------------//
+  static createCharacter3Animations(scene) {
+    scene.anims.create({
+      key: "walkUpCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 105,
+        end: 112,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkDownCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 131,
+        end: 138,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkRightCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 144,
+        end: 151,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkLeftCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 118,
+        end: 125,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "idleCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 27,
+        end: 29,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintLeftCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 507,
+        end: 514,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintRightCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 533,
+        end: 540,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintUpCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 494,
+        end: 500,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintDownCharacter3",
+      frames: scene.anims.generateFrameNumbers("Character3", {
+        start: 520,
+        end: 527,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+  }
+  //-----Define animations---------Character4-----------------------------//
+  static createPlayer4Animations(scene) {
+    scene.anims.create({
+      key: "walkUpPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 105,
+        end: 112,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkDownPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 131,
+        end: 138,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkRightPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 144,
+        end: 151,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "walkLeftPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 118,
+        end: 125,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "idlePlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 27,
+        end: 29,
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintLeftPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 507,
+        end: 514,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintRightPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 533,
+        end: 540,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintUpPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
+        start: 494,
+        end: 500,
+      }),
+      frameRate: 20,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "sprintDownPlayer4",
+      frames: scene.anims.generateFrameNumbers("Player4", {
         start: 520,
         end: 527,
       }),

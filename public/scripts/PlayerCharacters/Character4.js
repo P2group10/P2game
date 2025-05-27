@@ -5,7 +5,7 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
     // Store the scene and socket for later use
     this.scene = scene;
     this.socket = socket;
-    this.animation = "idlePlayerM";
+    this.animation = "idlePlayer4";
     this.isLocalPlayer = false;
     this.hud = hud || null; // Store HUD reference
 
@@ -40,42 +40,42 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
           (cursors.a.isDown && cursors.w.isDown) 
         ) {
           this.setVelocity(-sprintVelocit, -sprintVelocit);
-          this.anims.play("sprintUpPlayerM", true);
-          this.animation = "sprintUpPlayerM";
+          this.anims.play("sprintUpPlayer4", true);
+          this.animation = "sprintUpPlayer4";
         } else if (
           (cursors.a.isDown && cursors.s.isDown) 
         ) {
           this.setVelocity(-sprintVelocit, sprintVelocit);
-          this.anims.play("sprintDownPlayerM", true);
-          this.animation = "sprintDownPlayerM";
+          this.anims.play("sprintDownPlayer4", true);
+          this.animation = "sprintDownPlayer4";
         } else if (
           (cursors.d.isDown && cursors.w.isDown) 
         ) {
           this.setVelocity(sprintVelocit, -sprintVelocit);
-          this.anims.play("sprintUpPlayerM", true);
-          this.animation = "sprintUpPlayerM";
+          this.anims.play("sprintUpPlayer4", true);
+          this.animation = "sprintUpPlayer4";
         } else if (
           (cursors.d.isDown && cursors.s.isDown)
         ) {
           this.setVelocity(sprintVelocit, sprintVelocit);
-          this.anims.play("sprintDownPlayerM", true);
-          this.animation = "sprintDownPlayerM";
+          this.anims.play("sprintDownPlayer4", true);
+          this.animation = "sprintDownPlayer4";
         } else if (cursors.a.isDown ) {
           this.setVelocityX(-sprintVelocit);
-          this.anims.play("sprintLeftPlayerM", true);
-          this.animation = "sprintLeftPlayerM";
+          this.anims.play("sprintLeftPlayer4", true);
+          this.animation = "sprintLeftPlayer4";
         } else if (cursors.d.isDown) {
           this.setVelocityX(sprintVelocit);
-          this.anims.play("sprintRightPlayerM", true);
-          this.animation = "sprintRightPlayerM";
+          this.anims.play("sprintRightPlayer4", true);
+          this.animation = "sprintRightPlayer4";
         } else if (cursors.w.isDown ) {
           this.setVelocityY(-sprintVelocit);
-          this.anims.play("sprintUpPlayerM", true);
-          this.animation = "sprintUpPlayerM";
+          this.anims.play("sprintUpPlayer4", true);
+          this.animation = "sprintUpPlayer4";
         } else if (cursors.s.isDown ) {
           this.setVelocityY(sprintVelocit);
-          this.anims.play("sprintDownPlayerM", true);
-          this.animation = "sprintDownPlayerM";
+          this.anims.play("sprintDownPlayer4", true);
+          this.animation = "sprintDownPlayer4";
         }
       }
       // Walk movement
@@ -83,51 +83,50 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
         (cursors.a.isDown && cursors.w.isDown)
       ) {
         this.setVelocity(-velocity, -velocity);
-        this.anims.play("walkUpPlayerM", true);
-        this.animation = "walkUpPlayerM";
+        this.anims.play("walkUpPlayer4", true);
+        this.animation = "walkUpPlayer4";
       } else if (
         (cursors.a.isDown && cursors.s.isDown) 
       ) {
         this.setVelocity(-velocity, velocity);
-        this.anims.play("walkDownPlayerM", true);
-        this.animation = "walkDownPlayerM";
+        this.anims.play("walkDownPlayer4", true);
+        this.animation = "walkDownPlayer4";
       } else if (
         (cursors.d.isDown && cursors.w.isDown)
       ) {
         this.setVelocity(velocity, -velocity);
-        this.anims.play("walkUpPlayerM", true);
-        this.animation = "walkUpPlayerM";
+        this.anims.play("walkUpPlayer4", true);
+        this.animation = "walkUpPlayer4";
       } else if (
         (cursors.d.isDown && cursors.s.isDown) 
       ) {
         this.setVelocity(velocity, velocity);
-        this.anims.play("walkDownPlayerM", true);
-        this.animation = "walkDownPlayerM";
+        this.anims.play("walkDownPlayer4", true);
+        this.animation = "walkDownPlayer4";
       }
       // Straight walk
       else if (cursors.a.isDown) {
         this.setVelocityX(-velocity);
-        this.anims.play("walkLeftPlayerM", true);
-        this.animation = "walkLeftPlayerM";
+        this.anims.play("walkLeftPlayer4", true);
+        this.animation = "walkLeftPlayer4";
       } else if (cursors.d.isDown ) {
         this.setVelocityX(velocity);
-        this.flipX = false;
-        this.anims.play("walkRightPlayerM", true);
-        this.animation = "walkRightPlayerM";
+        this.anims.play("walkRightPlayer4", true);
+        this.animation = "walkRightPlayer4";
       } else if (cursors.w.isDown ) {
         this.setVelocityY(-velocity);
-        this.anims.play("walkUpPlayerM", true);
-        this.animation = "walkUpPlayerM";
+        this.anims.play("walkUpPlayer4", true);
+        this.animation = "walkUpPlayer4";
       } else if (cursors.s.isDown ) {
         this.setVelocityY(velocity);
-        this.anims.play("walkDownPlayerM", true);
-        this.animation = "walkDownPlayerM";
+        this.anims.play("walkDownPlayer4", true);
+        this.animation = "walkDownPlayer4";
       }
       // Idle animation
       else {
         this.setVelocity(0, 0);
-        this.anims.play("idlePlayerM", true);
-        this.animation = "idlePlayerM";
+        this.anims.play("idlePlayer4", true);
+        this.animation = "idlePlayer4";
       }
 
       // **Fix: Explicitly stop movement when keys are released**
