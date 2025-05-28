@@ -185,7 +185,7 @@ export default class character2 extends Phaser.Physics.Arcade.Sprite {
 
       // Transition to GameOver scene
       const scene = this.scene;
-      scene.time.delayedCall(100, () => {
+      scene.time.delayedCall(1000, () => {
         scene.scene.start("GameOverScene", {
           playerName: scene.playerName,
           score: scene.score || 0,
